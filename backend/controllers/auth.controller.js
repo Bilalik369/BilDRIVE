@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import Driver from "../models/driver.model.js";
 import { createError } from "../utils/error.utils.js";
+import crypto from "crypto"
+
 
 export const register = async (req, res, next) => {
   try {
@@ -17,7 +19,10 @@ export const register = async (req, res, next) => {
       return next(createError(400, "Un utilisateur avec cet email existe déjà"));
     }
 
-   
+    const verificationToken = crypto.randomBytes(32).toString("hex")
+    const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
+     
     const user = new User({
       firstName,
       lastName,
@@ -25,6 +30,8 @@ export const register = async (req, res, next) => {
       password,
       phone,
       role: role || "passenger",
+      verificationToken,
+      verificationTokenExpires,
     });
 
     await user.save();
