@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import Driver from "../models/driver.model.js";
 import { createError } from "../utils/error.utils.js";
 import crypto from "crypto";
-
+import { sendVerificationEmail } from "../utils/email.utils.js";
 export const register = async (req, res, next) => {
   try {
     const {
@@ -91,9 +91,21 @@ export const register = async (req, res, next) => {
       await driver.save();
     }
 
+    await sendVerificationEmail(user.email , verificationToken)
+
+    const token = user.generateAuthToken();
+    
+    const userWithoutPassword = { ...user.toObject() }
+    delete userWithoutPassword.password
+    delete userWithoutPassword.verificationToken
+    delete userWithoutPassword.verificationTokenExpires
+
+
     res.status(201).json({
       success: true,
       message: "Utilisateur enregistré avec succès. Veuillez vérifier votre email.",
+      token, 
+      userWithoutPassword,
     });
   } catch (error) {
     next(error);
