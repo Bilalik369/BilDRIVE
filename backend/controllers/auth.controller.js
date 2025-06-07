@@ -105,9 +105,54 @@ export const register = async (req, res, next) => {
       success: true,
       message: "Utilisateur enregistré avec succès. Veuillez vérifier votre email.",
       token, 
-      userWithoutPassword,
+      user: userWithoutPassword,
     });
   } catch (error) {
     next(error);
   }
 };
+
+export const login = async(req , res , next)=>{
+  try{
+    const {email , password} = req.body;
+    if(!email || !password){
+      return next(createError(401, "toute le champ oblogatoire"))
+    }
+
+    const user = await User.findOne(email).select("+password")
+    if(!user){
+      return next(createError(401 , "Invalid email or password"))
+    }
+
+    const isPasswordValide = await user.comparePassword(password)
+    if(!isPasswordValide){
+
+      return next(createError(401 , "Invalid email or password"))
+
+    }
+
+    user.lastLogin = Date.now();
+
+    await user.save();
+
+    const token = user.generateAuthToken();
+
+    const userWithoutPassword = { ...user.toObject() }
+    delete userWithoutPassword.password
+    delete userWithoutPassword.verificationToken
+    delete userWithoutPassword.verificationTokenExpires
+
+
+    res.status(201).json({
+      success: true,
+      message: "Login successful",
+      token,
+      user: userWithoutPassword,
+    })
+
+
+  }catch(error){
+  next(error)
+  }
+  
+}
