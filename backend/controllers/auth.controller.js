@@ -185,3 +185,39 @@ export const verifyEmail = async (req, res, next) => {
     next(error)
   }
 }
+
+export const resendVerificationEmail = async(req , res , next)=>{
+
+  try {
+    const {email} = req.body;
+
+    if (!email) {
+      return next(createError(400, "Email is required"))
+    }
+    const user = await User.findOne({email})
+    if(!user){
+      return next(createError(404 , "User not find"))
+    }
+    if(user.isVerified){
+      return next(createError(404 , "User already verfied"))
+    }
+
+
+    const verificationToken = crypto.randomBytes(32).toString("hex")
+    const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000) 
+
+    user.verificationToken = verificationToken
+    user.verificationTokenExpires= verificationTokenExpires
+    await user.save();
+
+    await sendVerificationEmail(user.email , verificationToken)
+    
+    res.status(201).json({
+      success: true,
+      message: "Verification email sent successfully",
+    })
+  } catch (error) {
+    next(error)
+  }
+
+}
