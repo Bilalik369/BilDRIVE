@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import Driver from "../models/driver.model.js";
 import { createError } from "../utils/error.utils.js";
 import crypto from "crypto";
-import { sendVerificationEmail } from "../utils/email.utils.js";
+import { sendVerificationEmail , sendPasswordResetEmail } from "../utils/email.utils.js";
 
 
 
@@ -248,7 +248,7 @@ export const forgotPassword = async(req , res , next)=>{
     await user.save();
 
 
-    await sendVerificationEmail(user.email , resetToken);
+    await sendPasswordResetEmail(user.email , resetToken);
 
 
     res.status(200).json({
