@@ -3,6 +3,9 @@ import Driver from "../models/driver.model.js";
 import { createError } from "../utils/error.utils.js";
 import crypto from "crypto";
 import { sendVerificationEmail } from "../utils/email.utils.js";
+
+
+
 export const register = async (req, res, next) => {
   try {
     const {
@@ -220,4 +223,40 @@ export const resendVerificationEmail = async(req , res , next)=>{
     next(error)
   }
 
+}
+
+export const forgotPassword = async(req , res , next)=>{
+  try{
+    const {email} = req.body;
+    if(!email){
+      return next(createError(400 , "Email is required "))
+
+    }
+
+    const user = await User.findOne({email})
+    if(!user){
+      return next(createError(404 , "User not fond"))
+
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex")
+    const resetTokenExpires = new Date(Date.now() + 1 * 60 * 60 * 1000)
+
+
+    user.resetToken = resetToken
+    user.resetTokenExpires = resetTokenExpires
+    await user.save();
+
+
+    await sendVerificationEmail(user.email , resetToken);
+
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset email sent successfully",
+    })
+  }catch(error){
+    next(error)
+
+  }
 }
