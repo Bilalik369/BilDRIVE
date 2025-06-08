@@ -22,7 +22,9 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (email, token) => {
   try {
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
+    const verificationUrl = `http://localhost:5000/api/auth/verify-email/${token}`
+
+
 
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
