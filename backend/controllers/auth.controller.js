@@ -119,7 +119,7 @@ export const login = async(req , res , next)=>{
       return next(createError(401, "toute le champ oblogatoire"))
     }
 
-    const user = await User.findOne(email).select("+password")
+    const user = await User.findOne({email}).select("+password")
     if(!user){
       return next(createError(401 , "Invalid email or password"))
     }
