@@ -261,5 +261,34 @@ export const forgotPassword = async(req , res , next)=>{
   }
 }
 
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { token } = req.params
+    const { password } = req.body
+
+    
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    })
+
+    if (!user) {
+      return next(createError(400, "Invalid or expired reset token"))
+    }
+
+ 
+    user.password = password
+    user.resetPasswordToken = undefined
+    user.resetPasswordExpires = undefined
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
 
