@@ -3,8 +3,9 @@ import Driver from "../models/driver.model.js";
 import { createError } from "../utils/error.utils.js";
 import crypto from "crypto";
 import { sendVerificationEmail , sendPasswordResetEmail } from "../utils/email.utils.js";
+import {OAuth2Client} from "google-auth-library" ;
 
-
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID); 
 
 export const register = async (req, res, next) => {
   try {
@@ -291,4 +292,59 @@ export const resetPassword = async (req, res, next) => {
   }
 }
 
+
+export const socialLogin = async(req , res , next)=>{
+  try{
+    const {provider , token} = req.body;
+
+    let verifiedData ;
+    if( provider === "google"){
+      const ticket = await client.verifyIdToken({
+        idToken:token,
+        audience: process.env.GOOGLE_CLIENT_ID
+      })
+      const payload = ticket.getPayload();
+
+      verifiedData= {
+        firstName: payload.given_name,
+        lastName: payload.family_name,
+        email: payload.email,
+        picture: payload.picture,
+      }
+
+    }else{
+      return next(createError(400, "Provider not supported yet"));
+    }
+
+    let user = await User.findOne({ email: verifiedData.email });
+
+    if(!user){
+      user = new User({
+        firstName: verifiedData.firstName,
+        lastName: verifiedData.lastName,
+        email: verifiedData.email,
+        password: crypto.randomBytes(16).toString("hex"), 
+        profilePicture: verifiedData.picture,
+        isVerified: true,
+      })
+      await user.save(); 
+
+    }
+
+    const jwtToken  = user.generateAuthToken();
+    
+
+    res.status(200).json({
+      success: true,
+      message: "Login successful",
+      token: jwtToken,
+      user,
+    });
+
+
+  }catch(error){
+    next(error);
+  }
+
+}
 

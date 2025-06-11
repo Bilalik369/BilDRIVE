@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken"
 import { createError } from "../utils/error.utils.js"
 import User from "../models/user.model.js"
+ ;
+
 
 export const authenticate = async (req, res, next) => {
   try {
@@ -39,3 +41,5 @@ export const authenticate = async (req, res, next) => {
     next(error)
   }
 }
+
+
