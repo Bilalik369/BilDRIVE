@@ -19,7 +19,7 @@ router.post("/social-login",  socialLogin);
 
 
 router.get("/me", authenticate, getCurrentUser);
-router.post("/change-password", authenticate,  changePassword)
+router.put("/change-password", authenticate,  changePassword)
 
 
 
