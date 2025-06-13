@@ -1,5 +1,5 @@
 import express from "express";
-import { register , login , verifyEmail, resendVerificationEmail ,forgotPassword, resetPassword , socialLogin,getCurrentUser } from "../controllers/auth.controller.js";
+import { register , login , verifyEmail, resendVerificationEmail ,forgotPassword, resetPassword , socialLogin,getCurrentUser, changePassword } from "../controllers/auth.controller.js";
 import {authenticate} from "../middleware/auth.middleware.js"
 
  
@@ -19,6 +19,7 @@ router.post("/social-login",  socialLogin);
 
 
 router.get("/me", authenticate, getCurrentUser);
+router.post("/change-password", authenticate,  changePassword)
 
 
 

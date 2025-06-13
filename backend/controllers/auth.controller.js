@@ -364,3 +364,31 @@ export const getCurrentUser = async (req, res, next) => {
   }
 }
 
+export const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+
+    
+    const user = await User.findById(req.user.id).select("+password")
+    if (!user) {
+      return next(createError(404, "User not found"))
+    }
+
+    
+    const isPasswordValid = await user.comparePassword(currentPassword)
+    if (!isPasswordValid) {
+      return next(createError(401, "Current password is incorrect"))
+    }
+
+  
+    user.password = newPassword
+    await user.save()
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+    })
+  } catch (error) {
+    next(error)
+  }
+}
