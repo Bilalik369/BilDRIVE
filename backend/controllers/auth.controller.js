@@ -348,3 +348,19 @@ export const socialLogin = async(req , res , next)=>{
 
 }
 
+export const getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id)
+    if (!user) {
+      return next(createError(404, "User not found"))
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
