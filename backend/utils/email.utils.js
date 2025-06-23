@@ -7,6 +7,8 @@ import nodemailer from "nodemailer";
 // console.log("EMAIL_SECURE:", process.env.EMAIL_SECURE);
 // console.log("EMAIL_USER:", process.env.EMAIL_USER);
 
+
+
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT), 
