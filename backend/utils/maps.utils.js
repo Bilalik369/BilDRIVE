@@ -161,7 +161,7 @@ export const reverseGeocode = async (coordinates) => {
     }
   }
 
-  export const findNearbyPlaces = async (coordinates, radius = 1000, type = null) => {
+export const findNearbyPlaces = async (coordinates, radius = 1000, type = null) => {
     try {
       const [lng, lat] = coordinates
       const params = {
@@ -198,3 +198,5 @@ export const reverseGeocode = async (coordinates) => {
       throw new Error(`Failed to find nearby places: ${error.message}`)
     }
   }
+
+  
