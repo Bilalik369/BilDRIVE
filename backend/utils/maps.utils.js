@@ -101,4 +101,34 @@ export const getDirections = async (origin, destination, waypoints = []) => {
       console.error("Error getting directions:", error)
       throw new Error(`Failed to get directions: ${error.message}`)
     }
-  }
+}
+
+export const geocodeAddress = async (address) => {
+    try {
+      const response = await axios.get("https://maps.googleapis.com/maps/api/geocode/json", {
+        params: {
+          address: address,
+          key: GOOGLE_MAPS_API_KEY,
+        },
+      })
+  
+      if (response.data.status !== "OK") {
+        throw new Error(`Geocoding API error: ${response.data.status}`)
+      }
+  
+      const result = response.data.results[0]
+  
+      return {
+        coordinates: [result.geometry.location.lng, result.geometry.location.lat], 
+        formattedAddress: result.formatted_address,
+        placeId: result.place_id,
+        types: result.types,
+        addressComponents: result.address_components,
+        bounds: result.geometry.bounds,
+        locationType: result.geometry.location_type,
+      }
+    } catch (error) {
+      console.error("Error geocoding address:", error)
+      throw new Error(`Failed to geocode address: ${error.message}`)
+    }
+}
