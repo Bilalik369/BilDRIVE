@@ -132,3 +132,31 @@ export const geocodeAddress = async (address) => {
       throw new Error(`Failed to geocode address: ${error.message}`)
     }
 }
+
+export const reverseGeocode = async (coordinates) => {
+    try {
+      const [lng, lat] = coordinates
+      const response = await axios.get("https://maps.googleapis.com/maps/api/geocode/json", {
+        params: {
+          latlng: `${lat},${lng}`,
+          key: GOOGLE_MAPS_API_KEY,
+        },
+      })
+  
+      if (response.data.status !== "OK") {
+        throw new Error(`Reverse geocoding API error: ${response.data.status}`)
+      }
+  
+      const results = response.data.results
+  
+      return results.map((result) => ({
+        formattedAddress: result.formatted_address,
+        placeId: result.place_id,
+        types: result.types,
+        addressComponents: result.address_components,
+      }))
+    } catch (error) {
+      console.error("Error reverse geocoding:", error)
+      throw new Error(`Failed to reverse geocode: ${error.message}`)
+    }
+  }
