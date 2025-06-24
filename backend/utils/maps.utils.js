@@ -199,4 +199,20 @@ export const findNearbyPlaces = async (coordinates, radius = 1000, type = null) 
     }
   }
 
+  export const calculateETA = async (origin, destination) => {
+    try {
+      const result = await getDistance(origin, destination)
+      const etaMinutes = Math.ceil(result.durationInTraffic / 60)
   
+      return {
+        eta: etaMinutes,
+        etaText: `${etaMinutes} min`,
+        distance: result.distance,
+        distanceText: result.distanceText,
+        withTraffic: true,
+      }
+    } catch (error) {
+      console.error("Error calculating ETA:", error)
+      throw new Error(`Failed to calculate ETA: ${error.message}`)
+    }
+  }
