@@ -160,3 +160,41 @@ export const reverseGeocode = async (coordinates) => {
       throw new Error(`Failed to reverse geocode: ${error.message}`)
     }
   }
+
+  export const findNearbyPlaces = async (coordinates, radius = 1000, type = null) => {
+    try {
+      const [lng, lat] = coordinates
+      const params = {
+        location: `${lat},${lng}`,
+        radius: radius,
+        key: GOOGLE_MAPS_API_KEY,
+      }
+  
+      if (type) {
+        params.type = type
+      }
+  
+      const response = await axios.get("https://maps.googleapis.com/maps/api/place/nearbysearch/json", {
+        params,
+      })
+  
+      if (response.data.status !== "OK") {
+        throw new Error(`Places API error: ${response.data.status}`)
+      }
+  
+      return response.data.results.map((place) => ({
+        placeId: place.place_id,
+        name: place.name,
+        vicinity: place.vicinity,
+        types: place.types,
+        rating: place.rating,
+        priceLevel: place.price_level,
+        coordinates: [place.geometry.location.lng, place.geometry.location.lat],
+        photos: place.photos ? place.photos.map((photo) => photo.photo_reference) : [],
+        openingHours: place.opening_hours,
+      }))
+    } catch (error) {
+      console.error("Error finding nearby places:", error)
+      throw new Error(`Failed to find nearby places: ${error.message}`)
+    }
+  }
