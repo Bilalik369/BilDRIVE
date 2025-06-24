@@ -47,3 +47,58 @@ export const getDistance = async (origin, destination) => {
       throw new Error(`Failed to calculate distance: ${error.message}`)
     }
   }
+
+export const getDirections = async (origin, destination, waypoints = []) => {
+    try {
+      const originStr = Array.isArray(origin) ? `${origin[1]},${origin[0]}` : origin
+      const destinationStr = Array.isArray(destination) ? `${destination[1]},${destination[0]}` : destination
+  
+      const params = {
+        origin: originStr,
+        destination: destinationStr,
+        mode: "driving",
+        departure_time: "now",
+        traffic_model: "best_guess",
+        key: GOOGLE_MAPS_API_KEY,
+      }
+  
+      if (waypoints.length > 0) {
+        params.waypoints = waypoints.map((wp) => (Array.isArray(wp) ? `${wp[1]},${wp[0]}` : wp)).join("|")
+      }
+  
+      const response = await axios.get("https://maps.googleapis.com/maps/api/directions/json", {
+        params,
+      })
+  
+      if (response.data.status !== "OK") {
+        throw new Error(`Google Directions API error: ${response.data.status}`)
+      }
+  
+      const route = response.data.routes[0]
+      const leg = route.legs[0]
+  
+      return {
+        distance: leg.distance.value,
+        distanceText: leg.distance.text,
+        duration: leg.duration.value,
+        durationText: leg.duration.text,
+        durationInTraffic: leg.duration_in_traffic ? leg.duration_in_traffic.value : leg.duration.value,
+        durationInTrafficText: leg.duration_in_traffic ? leg.duration_in_traffic.text : leg.duration.text,
+        polyline: route.overview_polyline.points,
+        steps: leg.steps.map((step) => ({
+          distance: step.distance.value,
+          duration: step.duration.value,
+          instructions: step.html_instructions.replace(/<[^>]*>/g, ""), 
+          startLocation: step.start_location,
+          endLocation: step.end_location,
+          polyline: step.polyline.points,
+        })),
+        bounds: route.bounds,
+        copyrights: route.copyrights,
+        warnings: route.warnings,
+      }
+    } catch (error) {
+      console.error("Error getting directions:", error)
+      throw new Error(`Failed to get directions: ${error.message}`)
+    }
+  }
