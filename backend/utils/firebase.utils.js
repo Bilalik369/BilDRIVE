@@ -18,42 +18,45 @@ const serviceAccount = {
     })
   }
 
-  export const sendPushNotification = async(fcmToken , title , body , data ={} )=>{
+  export const sendPushNotification = async (fcmToken, title, body, data = {}) => {
     try {
-        const message = {
-            notification: {
-              title,
-              body,
+      const message = {
+        notification: {
+          title,
+          body,
+        },
+        data: {
+          ...data,
+          timestamp: new Date().toISOString(),
+        },
+        token: fcmToken,
+        android: {
+          notification: {
+            icon: "ic_notification",
+            color: "#2563eb",
+            sound: "default",
+            priority: "high",
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
             },
-            data: {
-              ...data,
-              timestamp: new Date().toISOString(),
-            },
-            token: fcmToken,
-            android: {
-              notification: {
-                icon: "ic_notification",
-                color: "#2563eb",
-                sound: "default",
-                priority: "high",
-              },
-            },
-            apns: {
-              payload: {
-                aps: {
-                  sound: "default",
-                  badge: 1,
-                },
-              },
-            },
-          }
-
-          const respons = await admin.messaging().
-        
-    }catch (error) {
-        
+          },
+        },
+      }
+  
+      const response = await admin.messaging().send(message)
+      console.log("Push notification sent successfully:", response)
+      return { success: true, messageId: response }
+    } catch (error) {
+      console.error("Error sending push notification:", error)
+      throw new Error(`Failed to send push notification: ${error.message}`)
     }
   }
+  
 
 
 
