@@ -18,6 +18,42 @@ const serviceAccount = {
     })
   }
 
+  export const sendPushNotification = async(fcmToken , title , body , data ={} )=>{
+    try {
+        const message = {
+            notification: {
+              title,
+              body,
+            },
+            data: {
+              ...data,
+              timestamp: new Date().toISOString(),
+            },
+            token: fcmToken,
+            android: {
+              notification: {
+                icon: "ic_notification",
+                color: "#2563eb",
+                sound: "default",
+                priority: "high",
+              },
+            },
+            apns: {
+              payload: {
+                aps: {
+                  sound: "default",
+                  badge: 1,
+                },
+              },
+            },
+          }
+
+          const respons = await admin.messaging().
+        
+    }catch (error) {
+        
+    }
+  }
 
 
-  
+
