@@ -160,3 +160,22 @@ export const registerSchema = z.object({
       },
     ),
 })
+
+export const loginSchema = z.object({
+    body: z.object({
+      email: z
+        .string({
+          required_error: "L'email est obligatoire",
+        })
+        .email("Format d'email invalide")
+        .toLowerCase(),
+  
+      password: z
+        .string({
+          required_error: "Le mot de passe est obligatoire",
+        })
+        .min(1, "Le mot de passe est obligatoire"),
+  
+      rememberMe: z.boolean().optional().default(false),
+    }),
+  })
