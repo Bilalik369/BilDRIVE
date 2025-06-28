@@ -179,3 +179,14 @@ export const loginSchema = z.object({
       rememberMe: z.boolean().optional().default(false),
     }),
   })
+
+  export const emailSchema = z.object({
+    body: z.object({
+      email: z
+        .string({
+          required_error: "L'email est obligatoire",
+        })
+        .email("Format d'email invalide")
+        .toLowerCase(),
+    }),
+  })
