@@ -1,6 +1,10 @@
 import express from "express";
 import { register , login , verifyEmail, resendVerificationEmail ,forgotPassword, resetPassword , socialLogin,getCurrentUser, changePassword ,logout} from "../controllers/auth.controller.js";
 import {authenticate} from "../middleware/auth.middleware.js"
+import {
+    registerSchema,
+    
+  } from "../validations/auth.validation.js"
 
  
 
@@ -8,7 +12,7 @@ import {authenticate} from "../middleware/auth.middleware.js"
 const router = express.Router();
 
 
-router.post("/register", register);
+router.post("/register", validateRequest(registerSchema), register)
 router.post("/login", login);
 router.get("/verify-email/:token", verifyEmail)
 router.post("/resend-verification",  resendVerificationEmail)
