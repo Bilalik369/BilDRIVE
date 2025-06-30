@@ -258,3 +258,27 @@ export const loginSchema = z.object({
         path: ["newPassword"],
       }),
   })
+
+
+  export const socialLoginSchema = z.object({
+    body: z.object({
+      provider: z.enum(["google", "facebook", "apple"], {
+        required_error: "Le fournisseur est obligatoire",
+        invalid_type_error: "Fournisseur non supporté",
+      }),
+  
+      token: z
+        .string({
+          required_error: "Le token est obligatoire",
+        })
+        .min(1, "Token invalide"),
+  
+      deviceInfo: z
+        .object({
+          deviceId: z.string().optional(),
+          platform: z.enum(["web", "ios", "android"]).optional(),
+          version: z.string().optional(),
+        })
+        .optional(),
+    }),
+  })

@@ -7,6 +7,7 @@ import {
     loginSchema,
     resetPasswordSchema,
     emailSchema,
+    socialLoginSchema
 
     
   } from "../validations/auth.validation.js"
@@ -21,9 +22,9 @@ router.post("/register", validateRequest(registerSchema), register)
 router.post("/login", validateRequest(loginSchema), login)
 router.get("/verify-email/:token", verifyEmail)
 router.post("/resend-verification", validateRequest(emailSchema), resendVerificationEmail)
-router.post("/forgot-password",  forgotPassword)
+router.post("/forgot-password", validateRequest(emailSchema), forgotPassword)
 router.post("/reset-password/:token", validateRequest(resetPasswordSchema), resetPassword)
-router.post("/social-login",  socialLogin);
+router.post("/social-login", validateRequest(socialLoginSchema), socialLogin)
 
 
 
