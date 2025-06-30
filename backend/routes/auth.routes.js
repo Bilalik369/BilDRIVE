@@ -4,7 +4,9 @@ import {authenticate} from "../middleware/auth.middleware.js"
 import { validateRequest } from "../middleware/validation.middleware.js";
 import {
     registerSchema,
-    loginSchema
+    loginSchema,
+    resetPasswordSchema,
+    emailSchema,
 
     
   } from "../validations/auth.validation.js"
@@ -18,9 +20,9 @@ const router = express.Router();
 router.post("/register", validateRequest(registerSchema), register)
 router.post("/login", validateRequest(loginSchema), login)
 router.get("/verify-email/:token", verifyEmail)
-router.post("/resend-verification",  resendVerificationEmail)
+router.post("/resend-verification", validateRequest(emailSchema), resendVerificationEmail)
 router.post("/forgot-password",  forgotPassword)
-router.post("/reset-password/:token",  resetPassword)
+router.post("/reset-password/:token", validateRequest(resetPasswordSchema), resetPassword)
 router.post("/social-login",  socialLogin);
 
 

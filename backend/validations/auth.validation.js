@@ -224,3 +224,37 @@ export const loginSchema = z.object({
         .min(1, "Token invalide"),
     }),
   })
+
+  export const changePasswordSchema = z.object({
+    body: z
+      .object({
+        currentPassword: z
+          .string({
+            required_error: "Le mot de passe actuel est obligatoire",
+          })
+          .min(1, "Le mot de passe actuel est obligatoire"),
+  
+        newPassword: z
+          .string({
+            required_error: "Le nouveau mot de passe est obligatoire",
+          })
+          .min(8, "Le nouveau mot de passe doit contenir au moins 8 caractères")
+          .max(128, "Le nouveau mot de passe ne peut pas dépasser 128 caractères")
+          .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+            "Le nouveau mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial",
+          ),
+  
+        confirmNewPassword: z.string({
+          required_error: "La confirmation du nouveau mot de passe est obligatoire",
+        }),
+      })
+      .refine((data) => data.newPassword === data.confirmNewPassword, {
+        message: "Les nouveaux mots de passe ne correspondent pas",
+        path: ["confirmNewPassword"],
+      })
+      .refine((data) => data.currentPassword !== data.newPassword, {
+        message: "Le nouveau mot de passe doit être différent de l'ancien",
+        path: ["newPassword"],
+      }),
+  })
