@@ -190,3 +190,37 @@ export const loginSchema = z.object({
         .toLowerCase(),
     }),
   })
+
+
+
+  export const resetPasswordSchema = z.object({
+    body: z
+      .object({
+        password: z
+          .string({
+            required_error: "Le mot de passe est obligatoire",
+          })
+          .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+          .max(128, "Le mot de passe ne peut pas dépasser 128 caractères")
+          .regex(
+            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+            "Le mot de passe doit contenir au moins une minuscule, une majuscule, un chiffre et un caractère spécial",
+          ),
+  
+        confirmPassword: z.string({
+          required_error: "La confirmation du mot de passe est obligatoire",
+        }),
+      })
+      .refine((data) => data.password === data.confirmPassword, {
+        message: "Les mots de passe ne correspondent pas",
+        path: ["confirmPassword"],
+      }),
+  
+    params: z.object({
+      token: z
+        .string({
+          required_error: "Le token est obligatoire",
+        })
+        .min(1, "Token invalide"),
+    }),
+  })

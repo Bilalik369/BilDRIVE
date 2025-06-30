@@ -1,6 +1,7 @@
 import express from "express";
 import { register , login , verifyEmail, resendVerificationEmail ,forgotPassword, resetPassword , socialLogin,getCurrentUser, changePassword ,logout} from "../controllers/auth.controller.js";
 import {authenticate} from "../middleware/auth.middleware.js"
+import { validateRequest } from "../middleware/validation.middleware.js";
 import {
     registerSchema,
     loginSchema
