@@ -1,6 +1,11 @@
 import axios from "axios"
+import dotenv from "dotenv"
+
+dotenv.config();
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY
+
+console.log("GOOGLE_MAPS_API_KEY:", process.env.GOOGLE_MAPS_API_KEY);
 
 if (!GOOGLE_MAPS_API_KEY) {
   console.error("Google Maps API key is required but not provided")

@@ -8,9 +8,7 @@ import {
     resetPasswordSchema,
     emailSchema,
     socialLoginSchema
-
-    
-  } from "../validations/auth.validation.js"
+} from "../validations/auth.validation.js"
 
  
 
@@ -18,13 +16,13 @@ import {
 const router = express.Router();
 
 
-router.post("/register", validateRequest(registerSchema), register)
-router.post("/login", validateRequest(loginSchema), login)
+router.post("/register",  register)
+router.post("/login",  login)
 router.get("/verify-email/:token", verifyEmail)
-router.post("/resend-verification", validateRequest(emailSchema), resendVerificationEmail)
-router.post("/forgot-password", validateRequest(emailSchema), forgotPassword)
-router.post("/reset-password/:token", validateRequest(resetPasswordSchema), resetPassword)
-router.post("/social-login", validateRequest(socialLoginSchema), socialLogin)
+router.post("/resend-verification",  resendVerificationEmail)
+router.post("/forgot-password",  forgotPassword)
+router.post("/reset-password/:token",  resetPassword)
+router.post("/social-login",  socialLogin)
 
 
 

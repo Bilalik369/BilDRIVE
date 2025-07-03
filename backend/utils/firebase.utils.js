@@ -1,4 +1,8 @@
 import admin from "firebase-admin"
+import dotenv from "dotenv"
+
+
+dotenv.config();
 
 const serviceAccount = {
     type: "service_account",
@@ -10,6 +14,7 @@ const serviceAccount = {
     auth_uri: process.env.FIREBASE_AUTH_URI,
     token_uri: process.env.FIREBASE_TOKEN_URI,
   }
+  
 
   if (!admin.apps.length) {
     admin.initializeApp({
