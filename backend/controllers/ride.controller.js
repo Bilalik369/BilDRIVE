@@ -7,7 +7,7 @@ import { calculateRidePrice } from "../utils/pricing.utils.js"
 import { getDistance, getDirections } from "../utils/maps.utils.js"
 import { findNearbyDrivers } from "../utils/driver.utils.js"
 import { createNotification } from "../utils/notification.utils.js"
-import { sendToUser } from "../utils/realtime.utils.js"
+import { sendToUser , sendToDrivers } from "../utils/realtime.utils.js"
 import { sendPushNotification } from "../utils/firebase.utils.js"
 
 export const requestRide = async (req, res, next) => {
@@ -159,10 +159,96 @@ export const requestRide = async (req, res, next) => {
   }
 
 
-  export const acceptRide = async(req , res, next)=>{
+  export const acceptRide = async (req, res, next) => {
     try {
+      const { rideId } = req.params
+  
+ 
+      const ride = await Ride.findById(rideId).populate("passenger", "firstName lastName phone")
+      if (!ride) {
+        return next(createError(404, "Course non trouvée"))
+      }
+  
+   
+      if (ride.status !== "searching") {
+        return next(createError(400, "Course non disponible"))
+      }
+  
+     
+      const driver = await Driver.findOne({ user: req.user.id }).populate("user")
+      if (!driver) {
+        return next(createError(404, "Chauffeur non trouvé"))
+      }
+  
+     
+      if (!driver.isAvailable || driver.status !== "approved") {
+        return next(createError(400, "Chauffeur non disponible"))
+      }
+  
+      ride.driver = driver._id
+      ride.status = "accepted"
+      ride.acceptedAt = new Date()
+      await ride.save()
+  
+    
+      driver.isAvailable = false
+      driver.currentRide = ride._id
+      await driver.save()
+  
       
+      await createNotification({
+        recipient: ride.passenger._id,
+        title: "Course acceptée",
+        message: `${driver.user.firstName} a accepté votre course`,
+        type: "ride_accepted",
+        reference: ride._id,
+        referenceModel: "Ride",
+        data: {
+          rideId: ride._id,
+          driverId: driver._id,
+          driverName: driver.user.firstName + " " + driver.user.lastName,
+          driverPhone: driver.user.phone,
+          driverRating: driver.user.rating,
+          vehicleInfo: driver.vehicle,
+          estimatedArrival: new Date(Date.now() + 10 * 60 * 1000), 
+        },
+      })
+  
+ 
+      await sendPushNotification(ride.passenger._id.toString(), {
+        title: "Course acceptée",
+        body: `${driver.user.firstName} a accepté votre course`,
+        data: {
+          type: "ride_accepted",
+          rideId: ride._id.toString(),
+          driverId: driver._id.toString(),
+          driverName: driver.user.firstName + " " + driver.user.lastName,
+          driverPhone: driver.user.phone,
+        },
+      })
+  
+      
+      sendToUser(ride.passenger._id.toString(), "ride_accepted", {
+        rideId: ride._id,
+        driver: {
+          id: driver._id,
+          name: driver.user.firstName + " " + driver.user.lastName,
+          phone: driver.user.phone,
+          rating: driver.user.rating,
+          profilePicture: driver.user.profilePicture,
+          vehicle: driver.vehicle,
+        },
+      })
+  
+    
+      sendToDrivers("drivers", "ride_taken", { rideId: ride._id })
+  
+      res.status(200).json({
+        success: true,
+        message: "Course acceptée avec succès",
+        ride,
+      })
     } catch (error) {
-      
+      next(error)
     }
   }

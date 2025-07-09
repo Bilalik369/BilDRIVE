@@ -12,6 +12,6 @@ router.post("/" ,authenticate, requestRide)
 
 
 
-router.post("/:rideId/accept", authorize("driver"), acceptRide)
+router.post("/:rideId/accept",authenticate, authorize("driver"), acceptRide)
 
 export default router
