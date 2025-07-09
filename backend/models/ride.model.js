@@ -88,16 +88,37 @@ const rideSchema = new mongoose.Schema(
       },
     },
     distance: {
-      type: Number, 
+      type: Number,
       required: true,
     },
     duration: {
-      type: Number, 
+      type: Number,
       required: true,
     },
+
+  
     route: {
-      type: String,
+      polyline: {
+        type: String,
+      },
+      steps: [
+        {
+          distance: Number,
+          duration: Number,
+          instructions: String,
+          startLocation: {
+            lat: Number,
+            lng: Number,
+          },
+          endLocation: {
+            lat: Number,
+            lng: Number,
+          },
+          polyline: String,
+        },
+      ],
     },
+
     payment: {
       method: {
         type: String,
@@ -125,6 +146,7 @@ const rideSchema = new mongoose.Schema(
         change: Number,
       },
     },
+
     rating: {
       passenger: {
         value: {
@@ -145,11 +167,12 @@ const rideSchema = new mongoose.Schema(
         createdAt: Date,
       },
     },
+
     notes: String,
   },
   {
     timestamps: true,
-  },
+  }
 )
 
 rideSchema.index({ "pickup.location": "2dsphere" })
