@@ -159,4 +159,10 @@ export const requestRide = async (req, res, next) => {
   }
 
 
-  
+  export const acceptRide = async(req , res, next)=>{
+    try {
+      
+    } catch (error) {
+      
+    }
+  }
