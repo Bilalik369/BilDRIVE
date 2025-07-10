@@ -312,3 +312,65 @@ export const requestRide = async (req, res, next) => {
       next(error)
     }
   }
+
+  export const startRide = async (req, res, next) => {
+    try {
+      const { rideId } = req.params
+  
+    
+      const ride = await Ride.findById(rideId).populate("passenger")
+      if (!ride) {
+        return next(createError(404, "Course non trouvée"))
+      }
+  
+      
+      const driver = await Driver.findOne({ user: req.user.id })
+      if (!driver || !ride.driver.equals(driver._id)) {
+        return next(createError(403, "Non autorisé à modifier cette course"))
+      }
+  
+   
+      if (ride.status !== "arrived") {
+        return next(createError(400, "Statut de course incorrect"))
+      }
+  
+     
+      ride.status = "inProgress"
+      ride.pickupTime = new Date()
+      await ride.save()
+  
+      
+      await createNotification({
+        recipient: ride.passenger._id,
+        title: "Course commencée",
+        message: "Votre course a commencé",
+        type: "ride_started",
+        reference: ride._id,
+        referenceModel: "Ride",
+      })
+  
+      
+      await sendPushNotification(ride.passenger._id.toString(), {
+        title: "Course commencée",
+        body: "Votre course a commencé",
+        data: {
+          type: "ride_started",
+          rideId: ride._id.toString(),
+        },
+      })
+  
+      
+      sendToUser(ride.passenger._id.toString(), "ride_started", {
+        rideId: ride._id,
+        message: "Votre course a commencé",
+      })
+  
+      res.status(200).json({
+        success: true,
+        message: "Course commencée avec succès",
+        ride,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
