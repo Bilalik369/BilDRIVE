@@ -374,3 +374,5 @@ export const requestRide = async (req, res, next) => {
       next(error)
     }
   }
+
+  
