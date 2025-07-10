@@ -1,5 +1,5 @@
 import express from "express"
-import {requestRide , acceptRide, }  from "../controllers/ride.controller.js"
+import {requestRide , acceptRide,arrivedAtPickup }  from "../controllers/ride.controller.js"
 import {authenticate } from "../middleware/auth.middleware.js"
 import {authorize} from "../middleware/role.middleware.js"
 
@@ -12,6 +12,9 @@ router.post("/" ,authenticate, requestRide)
 
 
 
-router.post("/:rideId/accept",authenticate, authorize("driver"), acceptRide)
+router.post("/:rideId/accept", authenticate, authorize("driver"), acceptRide)
+router.post("/:rideId/arrived", authorize("driver"), arrivedAtPickup)
+
+
 
 export default router

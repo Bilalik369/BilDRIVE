@@ -252,3 +252,63 @@ export const requestRide = async (req, res, next) => {
       next(error)
     }
   }
+
+  export const arrivedAtPickup = async (req, res, next) => {
+    try {
+      const { rideId } = req.params
+  
+    
+      const ride = await Ride.findById(rideId).populate("passenger")
+      if (!ride) {
+        return next(createError(404, "Course non trouvée"))
+      }
+  
+      const driver = await Driver.findOne({ user: req.user.id })
+      if (!driver || !ride.driver.equals(driver._id)) {
+        return next(createError(403, "Non autorisé à modifier cette course"))
+      }
+  
+      if (ride.status !== "accepted") {
+        return next(createError(400, "Statut de course incorrect"))
+      }
+  
+      
+      ride.status = "arrived"
+      ride.arrivedAt = new Date()
+      await ride.save()
+  
+      
+      await createNotification({
+        recipient: ride.passenger._id,
+        title: "Chauffeur arrivé",
+        message: "Votre chauffeur est arrivé au point de prise en charge",
+        type: "ride_arrived",
+        reference: ride._id,
+        referenceModel: "Ride",
+      })
+  
+     
+      await sendPushNotification(ride.passenger._id.toString(), {
+        title: "Chauffeur arrivé",
+        body: "Votre chauffeur est arrivé au point de prise en charge",
+        data: {
+          type: "ride_arrived",
+          rideId: ride._id.toString(),
+        },
+      })
+  
+     
+      sendToUser(ride.passenger._id.toString(), "driver_arrived", {
+        rideId: ride._id,
+        message: "Votre chauffeur est arrivé",
+      })
+  
+      res.status(200).json({
+        success: true,
+        message: "Arrivée confirmée avec succès",
+        ride,
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
