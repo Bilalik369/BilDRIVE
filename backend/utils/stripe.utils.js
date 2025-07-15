@@ -253,3 +253,25 @@ export const createCustomer = async (email, name, phone = null) => {
       throw new Error(`Failed to get payment intent: ${error.message}`)
     }
   }
+
+  export const formatAmount = (amount, currency = "EUR") => {
+    return new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: currency.toUpperCase(),
+    }).format(amount)
+  }
+  
+
+  export const calculatePlatformFee = (amount, feePercentage = 15) => {
+    const fee = (amount * feePercentage) / 100
+    const driverAmount = amount - fee
+    return {
+      totalAmount: amount,
+      platformFee: fee,
+      driverAmount: driverAmount,
+      feePercentage,
+    }
+  }
+  
+  export default stripe
+  
