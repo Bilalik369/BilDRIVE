@@ -59,3 +59,31 @@ export const createCustomer = async (email, name, phone = null) => {
       throw new Error(`Failed to create customer: ${error.message}`)
     }
   }
+
+  export const attachPaymentMethod = async (paymentMethodId, customerId) => {
+    try {
+      await stripe.paymentMethods.attach(paymentMethodId, {
+        customer: customerId,
+      })
+  
+      return { success: true }
+    } catch (error) {
+      console.error("Error attaching payment method:", error)
+      throw new Error(`Failed to attach payment method: ${error.message}`)
+    }
+  }
+
+  export const setDefaultPaymentMethod = async (customerId, paymentMethodId) => {
+    try {
+      await stripe.customers.update(customerId, {
+        invoice_settings: {
+          default_payment_method: paymentMethodId,
+        },
+      })
+  
+      return { success: true }
+    } catch (error) {
+      console.error("Error setting default payment method:", error)
+      throw new Error(`Failed to set default payment method: ${error.message}`)
+    }
+  }
