@@ -225,3 +225,31 @@ export const createCustomer = async (email, name, phone = null) => {
       throw new Error(`Failed to get account balance: ${error.message}`)
     }
   }
+
+
+  export const verifyWebhookSignature = (payload, signature, secret) => {
+    try {
+      return stripe.webhooks.constructEvent(payload, signature, secret)
+    } catch (error) {
+      console.error("Error verifying webhook signature:", error)
+      throw new Error(`Invalid webhook signature: ${error.message}`)
+    }
+  }
+  
+  
+  export const getPaymentIntent = async (paymentIntentId) => {
+    try {
+      const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+      return {
+        id: paymentIntent.id,
+        amount: paymentIntent.amount / 100,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+        customer: paymentIntent.customer,
+        metadata: paymentIntent.metadata,
+      }
+    } catch (error) {
+      console.error("Error getting payment intent:", error)
+      throw new Error(`Failed to get payment intent: ${error.message}`)
+    }
+  }
