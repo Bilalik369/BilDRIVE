@@ -25,3 +25,17 @@ export const createPaymentIntent = async (amount, currency = "eur", customerId =
     throw new Error(`Failed to create payment intent: ${error.message}`)
   }
 }
+
+export const confirmPaymentIntent = async (paymentIntentId) => {
+    try {
+      const paymentIntent = await stripe.paymentIntents.confirm(paymentIntentId)
+      return {
+        status: paymentIntent.status,
+        paymentMethod: paymentIntent.payment_method,
+        charges: paymentIntent.charges.data,
+      }
+    } catch (error) {
+      console.error("Error confirming payment intent:", error)
+      throw new Error(`Failed to confirm payment intent: ${error.message}`)
+    }
+  }
