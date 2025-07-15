@@ -39,3 +39,23 @@ export const confirmPaymentIntent = async (paymentIntentId) => {
       throw new Error(`Failed to confirm payment intent: ${error.message}`)
     }
   }
+
+
+export const createCustomer = async (email, name, phone = null) => {
+    try {
+      const customer = await stripe.customers.create({
+        email,
+        name,
+        phone,
+      })
+  
+      return {
+        customerId: customer.id,
+        email: customer.email,
+        name: customer.name,
+      }
+    } catch (error) {
+      console.error("Error creating customer:", error)
+      throw new Error(`Failed to create customer: ${error.message}`)
+    }
+  }
