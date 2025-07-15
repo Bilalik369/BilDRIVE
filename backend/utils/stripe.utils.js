@@ -138,3 +138,46 @@ export const createCustomer = async (email, name, phone = null) => {
       throw new Error(`Failed to create refund: ${error.message}`)
     }
   }
+
+  export const createConnectedAccount = async (email, country = "FR") => {
+    try {
+      const account = await stripe.accounts.create({
+        type: "express",
+        country,
+        email,
+        capabilities: {
+          card_payments: { requested: true },
+          transfers: { requested: true },
+        },
+      })
+  
+      return {
+        accountId: account.id,
+        email: account.email,
+        country: account.country,
+      }
+    } catch (error) {
+      console.error("Error creating connected account:", error)
+      throw new Error(`Failed to create connected account: ${error.message}`)
+    }
+  }
+  
+
+  export const createAccountLink = async (accountId, returnUrl, refreshUrl) => {
+    try {
+      const accountLink = await stripe.accountLinks.create({
+        account: accountId,
+        return_url: returnUrl,
+        refresh_url: refreshUrl,
+        type: "account_onboarding",
+      })
+  
+      return {
+        url: accountLink.url,
+        expiresAt: accountLink.expires_at,
+      }
+    } catch (error) {
+      console.error("Error creating account link:", error)
+      throw new Error(`Failed to create account link: ${error.message}`)
+    }
+  }
