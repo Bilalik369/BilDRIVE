@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./lib/db.js"; 
+import cors from 'cors' 
 import { createServer } from "http"
 import authRoutes from "./routes/auth.routes.js"
 import rideRoutes from "./routes/ride.routes.js"
@@ -11,6 +12,12 @@ const app = express();
 const server = createServer(app);
 
 initializeSocket(server);
+app.use(cors({
+  origin: ["http://localhost:3000", "http://127.0.0.1:3000"  , "http://localhost:3001","http://127.0.0.1:3001" ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
 
 app.use(express.json());
 

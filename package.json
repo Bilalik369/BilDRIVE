@@ -2,6 +2,10 @@
   "name": "nom-de-ton-projet",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
   "dependencies": {
     "axios": "^1.10.0",
     "bcrypt": "^6.0.0",
@@ -17,6 +21,7 @@
     "nodemailer": "^7.0.3",
     "socket": "^1.0.8",
     "socket.io": "^4.8.1",
+    "stripe": "^18.3.0",
     "zod": "^3.25.67"
   }
 }
