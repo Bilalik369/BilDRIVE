@@ -181,3 +181,47 @@ export const createCustomer = async (email, name, phone = null) => {
       throw new Error(`Failed to create account link: ${error.message}`)
     }
   }
+
+  export const createTransfer = async (amount, destinationAccountId, metadata = {}) => {
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: Math.round(amount * 100), // Convert to cents
+        currency: "eur",
+        destination: destinationAccountId,
+        metadata,
+      })
+  
+      return {
+        transferId: transfer.id,
+        amount: transfer.amount / 100, // Convert back to euros
+        destination: transfer.destination,
+        status: "succeeded",
+      }
+    } catch (error) {
+      console.error("Error creating transfer:", error)
+      throw new Error(`Failed to create transfer: ${error.message}`)
+    }
+  }
+  
+
+  export const getAccountBalance = async (accountId = null) => {
+    try {
+      const balance = accountId
+        ? await stripe.balance.retrieve({ stripeAccount: accountId })
+        : await stripe.balance.retrieve()
+  
+      return {
+        available: balance.available.map((b) => ({
+          amount: b.amount / 100,
+          currency: b.currency,
+        })),
+        pending: balance.pending.map((b) => ({
+          amount: b.amount / 100,
+          currency: b.currency,
+        })),
+      }
+    } catch (error) {
+      console.error("Error getting account balance:", error)
+      throw new Error(`Failed to get account balance: ${error.message}`)
+    }
+  }
