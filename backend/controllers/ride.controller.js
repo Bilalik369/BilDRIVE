@@ -629,3 +629,42 @@ export const getRideById = async (req, res, next) => {
   }
 }
 
+
+export const getUserRides = async (req, res, next) => {
+  try {
+    const { status, limit = 10, page = 1 } = req.query
+    const skip = (page - 1) * limit
+
+    const query = { passenger: req.user.id }
+    if (status) {
+      query.status = status
+    }
+
+    const rides = await Ride.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number.parseInt(limit))
+      .populate({
+        path: "driver",
+        populate: {
+          path: "user",
+          select: "firstName lastName profilePicture rating",
+        },
+      })
+
+    const total = await Ride.countDocuments(query)
+
+    res.status(200).json({
+      success: true,
+      rides,
+      pagination: {
+        total,
+        page: Number.parseInt(page),
+        pages: Math.ceil(total / limit),
+        limit: Number.parseInt(limit),
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
