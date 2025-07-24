@@ -363,4 +363,120 @@ export const startRide = async (req, res, next) => {
   }
 };
 
+export const completeRide = async (req, res, next) => {
+  try {
+    const { rideId } = req.params
+
+   
+    const ride = await Ride.findById(rideId).populate("passenger")
+    if (!ride) {
+      return next(createError(404, "Course non trouvée"))
+    }
+
+   
+    const driver = await Driver.findOne({ user: req.user.id }).populate("user")
+    if (!driver || !ride.driver.equals(driver._id)) {
+      return next(createError(403, "Non autorisé à modifier cette course"))
+    }
+
+
+    if (ride.status !== "inProgress") {
+      return next(createError(400, "Statut de course incorrect"))
+    }
+
+
+    ride.status = "completed"
+    ride.dropoffTime = new Date()
+    await ride.save()
+
+    if (ride.payment.method !== "cash") {
+      try {
+        const paymentResult = await processPayment({
+          amount: ride.price.total,
+          currency: "EUR",
+          user: ride.passenger,
+          description: `Course de ${ride.pickup.address} vers ${ride.destination.address}`,
+          paymentMethod: ride.payment.method,
+        })
+
+        ride.payment.status = paymentResult.status
+        ride.payment.transactionId = paymentResult.transactionId
+        await ride.save()
+
+        
+        const payment = new Payment({
+          user: ride.passenger._id,
+          type: "ride",
+          amount: ride.price.total,
+          status: paymentResult.status,
+          method: ride.payment.method,
+          transactionId: paymentResult.transactionId,
+          reference: ride._id,
+          referenceModel: "Ride",
+        })
+        await payment.save()
+
+       
+        if (paymentResult.status === "completed") {
+          const receipt = await generateRideReceipt(ride)
+          payment.receipt = {
+            url: receipt,
+            generatedAt: new Date(),
+          }
+          await payment.save()
+        }
+      } catch (paymentError) {
+        console.error("Payment processing error:", paymentError)
+        ride.payment.status = "failed"
+        await ride.save()
+      }
+    } else {
+      
+      ride.payment.status = "cash_pending"
+      await ride.save()
+    }
+
+   
+    driver.completedRides += 1
+    driver.isAvailable = true
+    driver.currentRide = null
+    driver.balance += ride.price.total * 0.8 
+    await driver.save()
+
+   
+    await createNotification({
+      recipient: ride.passenger._id,
+      title: "Course terminée",
+      message: "Votre course s'est terminée avec succès",
+      type: "ride_completed",
+      reference: ride._id,
+      referenceModel: "Ride",
+    })
+
+    
+    await sendPushNotification(ride.passenger._id.toString(), {
+      title: "Course terminée",
+      body: "Votre course s'est terminée avec succès",
+      data: {
+        type: "ride_completed",
+        rideId: ride._id.toString(),
+        paymentStatus: ride.payment.status,
+      },
+    })
+
+    sendToUser(ride.passenger._id.toString(), "ride_completed", {
+      rideId: ride._id,
+      message: "Course terminée avec succès",
+      paymentStatus: ride.payment.status,
+    })
+
+    res.status(200).json({
+      success: true,
+      message: "Course terminée avec succès",
+      ride,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 
