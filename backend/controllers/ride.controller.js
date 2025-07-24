@@ -590,3 +590,42 @@ export const cancelRide = async (req, res, next) => {
     next(error)
   }
 }
+
+
+export const getRideById = async (req, res, next) => {
+  try {
+    const { rideId } = req.params
+
+    const ride = await Ride.findById(rideId)
+      .populate("passenger", "firstName lastName phone profilePicture rating")
+      .populate({
+        path: "driver",
+        populate: {
+          path: "user",
+          select: "firstName lastName phone profilePicture rating",
+        },
+      })
+
+    if (!ride) {
+      return next(createError(404, "Course non trouvée"))
+    }
+
+
+    const isPassenger = ride.passenger._id.equals(req.user.id)
+    const driver = await Driver.findOne({ user: req.user.id })
+    const isDriver = driver && ride.driver && ride.driver._id.equals(driver._id)
+    const isAdmin = req.user.role === "admin"
+
+    if (!isPassenger && !isDriver && !isAdmin) {
+      return next(createError(403, "Non autorisé à voir cette course"))
+    }
+
+    res.status(200).json({
+      success: true,
+      ride,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
