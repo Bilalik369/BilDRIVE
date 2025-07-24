@@ -479,4 +479,114 @@ export const completeRide = async (req, res, next) => {
     next(error)
   }
 }
+export const cancelRide = async (req, res, next) => {
+  try {
+    const { rideId } = req.params
+    const { reason } = req.body
 
+   
+    const ride = await Ride.findById(rideId).populate("passenger")
+    if (!ride) {
+      return next(createError(404, "Course non trouvée"))
+    }
+
+    const isPassenger = ride.passenger._id.equals(req.user.id)
+    const driver = await Driver.findOne({ user: req.user.id })
+    const isDriver = driver && ride.driver && ride.driver.equals(driver._id)
+
+    if (!isPassenger && !isDriver) {
+      return next(createError(403, "Non autorisé à annuler cette course"))
+    }
+
+  
+    if (["completed", "cancelled", "noDriver"].includes(ride.status)) {
+      return next(createError(400, "Course ne peut pas être annulée"))
+    }
+
+
+    ride.status = "cancelled"
+    ride.cancelledBy = isPassenger ? "passenger" : "driver"
+    ride.cancellationReason = reason || "Aucune raison fournie"
+    ride.cancelledAt = new Date()
+    await ride.save()
+
+   
+    if (isDriver) {
+      driver.isAvailable = true
+      driver.currentRide = null
+      await driver.save()
+
+    
+      await createNotification({
+        recipient: ride.passenger._id,
+        title: "Course annulée",
+        message: "Votre course a été annulée par le chauffeur",
+        type: "ride_cancelled",
+        reference: ride._id,
+        referenceModel: "Ride",
+      })
+
+ 
+      await sendPushNotification(ride.passenger._id.toString(), {
+        title: "Course annulée",
+        body: "Votre course a été annulée par le chauffeur",
+        data: {
+          type: "ride_cancelled",
+          rideId: ride._id.toString(),
+          reason: reason || "Annulée par le chauffeur",
+        },
+      })
+
+    
+      sendToUser(ride.passenger._id.toString(), "ride_cancelled", {
+        rideId: ride._id,
+        reason: reason || "Annulée par le chauffeur",
+      })
+    }
+
+    if (isPassenger && ride.driver) {
+      
+      const rideDriver = await Driver.findById(ride.driver)
+      if (rideDriver) {
+        rideDriver.isAvailable = true
+        rideDriver.currentRide = null
+        await rideDriver.save()
+      }
+
+      
+      await createNotification({
+        recipient: rideDriver.user,
+        title: "Course annulée",
+        message: "Une course a été annulée par le passager",
+        type: "ride_cancelled",
+        reference: ride._id,
+        referenceModel: "Ride",
+      })
+
+    
+      await sendPushNotification(rideDriver.user.toString(), {
+        title: "Course annulée",
+        body: "Une course a été annulée par le passager",
+        data: {
+          type: "ride_cancelled",
+          rideId: ride._id.toString(),
+          reason: reason || "Annulée par le passager",
+        },
+      })
+
+      
+      sendToUser(rideDriver.user.toString(), "ride_cancelled", {
+        rideId: ride._id,
+        reason: reason || "Annulée par le passager",
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Course annulée avec succès",
+      ride,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
