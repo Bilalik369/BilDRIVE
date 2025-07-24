@@ -709,3 +709,98 @@ export const getDriverRides = async (req, res, next) => {
     next(error)
   }
 }
+
+
+export const rateRide = async (req, res, next) => {
+  try {
+    const { rideId } = req.params
+    const { rating, comment } = req.body
+
+
+    if (rating < 1 || rating > 5) {
+      return next(createError(400, "La note doit être entre 1 et 5"))
+    }
+
+
+    const ride = await Ride.findById(rideId)
+    if (!ride) {
+      return next(createError(404, "Course non trouvée"))
+    }
+
+    if (ride.status !== "completed") {
+      return next(createError(400, "Course non terminée"))
+    }
+
+
+    const isPassenger = ride.passenger.equals(req.user.id)
+    const driver = await Driver.findOne({ user: req.user.id })
+    const isDriver = driver && ride.driver.equals(driver._id)
+
+    if (!isPassenger && !isDriver) {
+      return next(createError(403, "Non autorisé à noter cette course"))
+    }
+
+
+    if (isPassenger) {
+   
+      if (ride.rating.passenger) {
+        return next(createError(400, "Vous avez déjà noté cette course"))
+      }
+
+      ride.rating.passenger = {
+        value: rating,
+        comment,
+        createdAt: new Date(),
+      }
+
+    
+      const rideDriver = await Driver.findById(ride.driver).populate("user")
+      if (rideDriver) {
+        const user = await User.findById(rideDriver.user._id)
+        const currentRating = user.rating || 0
+        const currentCount = user.ratingCount || 0
+        const newCount = currentCount + 1
+        const newRating = (currentRating * currentCount + rating) / newCount
+
+        user.rating = Math.round(newRating * 10) / 10 
+        user.ratingCount = newCount
+        await user.save()
+      }
+    } else {
+      
+      if (ride.rating.driver) {
+        return next(createError(400, "Vous avez déjà noté cette course"))
+      }
+
+      ride.rating.driver = {
+        value: rating,
+        comment,
+        createdAt: new Date(),
+      }
+
+    
+      const user = await User.findById(ride.passenger)
+      const currentRating = user.rating || 0
+      const currentCount = user.ratingCount || 0
+      const newCount = currentCount + 1
+      const newRating = (currentRating * currentCount + rating) / newCount
+
+      user.rating = Math.round(newRating * 10) / 10 
+      user.ratingCount = newCount
+      await user.save()
+    }
+
+    await ride.save()
+
+    res.status(200).json({
+      success: true,
+      message: "Course notée avec succès",
+      ride,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
+
