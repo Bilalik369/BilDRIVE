@@ -668,3 +668,44 @@ export const getUserRides = async (req, res, next) => {
     next(error)
   }
 }
+
+export const getDriverRides = async (req, res, next) => {
+  try {
+    const { status, limit = 10, page = 1 } = req.query
+    const skip = (page - 1) * limit
+
+    
+    const driver = await Driver.findOne({ user: req.user.id })
+    if (!driver) {
+      return next(createError(404, "Chauffeur non trouvé"))
+    }
+
+
+    const query = { driver: driver._id }
+    if (status) {
+      query.status = status
+    }
+
+   
+    const rides = await Ride.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(Number.parseInt(limit))
+      .populate("passenger", "firstName lastName profilePicture rating")
+
+    const total = await Ride.countDocuments(query)
+
+    res.status(200).json({
+      success: true,
+      rides,
+      pagination: {
+        total,
+        page: Number.parseInt(page),
+        pages: Math.ceil(total / limit),
+        limit: Number.parseInt(limit),
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
