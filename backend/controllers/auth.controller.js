@@ -116,7 +116,133 @@ export const register = async (req, res, next) => {
   }
 };
 
+// export const register = async (req, res, next) => {
+//   try {
+//     const {
+//       firstName,
+//       lastName,
+//       email,
+//       password,
+//       phone,
+//       role,
+//       licenseNumber,
+//       licenseExpiry,
+//       idCard,
+//       vehicleType,
+//       vehicleMake,
+//       vehicleModel,
+//       vehicleYear,
+//       vehicleColor,
+//       vehicleLicensePlate,
+//       vehicleInsuranceNumber,
+//       vehicleInsuranceExpiry,
+//       currentLocation,
+//     } = req.body;
 
+    
+//     if (!firstName || !lastName || !email || !password || !phone || !role) {
+//       return next(createError(400, "Tous les champs sont obligatoires"));
+//     }
+
+//     const existingUser = await User.findOne({ email });
+//     if (existingUser) {
+//       return next(createError(400, "Un utilisateur avec cet email existe déjà"));
+//     }
+
+//     const verificationToken = crypto.randomBytes(32).toString("hex");
+//     const verificationTokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); 
+
+//     const user = new User({
+//       firstName,
+//       lastName,
+//       email,
+//       password,
+//       phone,
+//       role: role || "passenger",
+//       verificationToken,
+//       verificationTokenExpires,
+//     });
+
+//     await user.save();
+
+    
+//     if (user.role === "driver") {
+//       if (
+//         !licenseNumber ||
+//         !licenseExpiry ||
+//         !idCard ||
+//         !vehicleType ||
+//         !vehicleMake ||
+//         !vehicleModel ||
+//         !vehicleYear ||
+//         !vehicleColor ||
+//         !vehicleLicensePlate ||
+//         !vehicleInsuranceNumber ||
+//         !vehicleInsuranceExpiry
+//       ) {
+//         return next(
+//           createError(400, "Tous les champs du conducteur sont obligatoires")
+//         );
+//       }
+
+    
+//       let locationData = {};
+//       if (currentLocation) {
+//         if (!currentLocation.coordinates || 
+//             !Array.isArray(currentLocation.coordinates) || 
+//             currentLocation.coordinates.length !== 2) {
+//           return next(createError(400, "Format de localisation invalide"));
+//         }
+        
+//         locationData.currentLocation = {
+//           type: "Point",
+//           coordinates: [
+//             parseFloat(currentLocation.coordinates[0]), 
+//             parseFloat(currentLocation.coordinates[1])  
+//           ]
+//         };
+//       }
+
+//       const driver = new Driver({
+//         user: user._id,
+//         licenseNumber,
+//         licenseExpiry,
+//         idCard,
+//         vehicle: {
+//           type: vehicleType,
+//           make: vehicleMake,
+//           model: vehicleModel,
+//           year: vehicleYear,
+//           color: vehicleColor,
+//           licensePlate: vehicleLicensePlate,
+//           insuranceNumber: vehicleInsuranceNumber,
+//           insuranceExpiry: vehicleInsuranceExpiry,
+//         },
+//         ...locationData,
+//       });
+
+//       await driver.save();
+//     }
+
+//     await sendVerificationEmail(user.email , verificationToken)
+
+//     const token = user.generateAuthToken();
+    
+//     const userWithoutPassword = { ...user.toObject() }
+//     delete userWithoutPassword.password
+//     delete userWithoutPassword.verificationToken
+//     delete userWithoutPassword.verificationTokenExpires
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Utilisateur enregistré avec succès. Veuillez vérifier votre email.",
+//       token, 
+//       user: userWithoutPassword,
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export const login = async(req , res , next)=>{
   console.log("Données reçues dans req.body:", req.body);

@@ -21,18 +21,22 @@ export const requestRide = async (req, res, next) => {
       notes,
     } = req.body;
 
+    
     const { distance, duration } = await getDistance(
       pickup.location.coordinates,
       destination.location.coordinates,
     );
 
+    n
     const routeInfo = await getDirections(
       pickup.location.coordinates,
       destination.location.coordinates,
     );
 
+    
     const price = calculateRidePrice(distance, duration, vehicleType);
 
+   
     const ride = new Ride({
       passenger: req.user.id,
       pickup,
@@ -61,11 +65,12 @@ export const requestRide = async (req, res, next) => {
 
     await ride.save();
 
+   
     if (scheduledTime) {
       await createNotification({
         recipient: req.user.id,
         title: "Course programmée",
-        message: `Votre course pour ${new Date(scheduledTime).toLocaleString()} a été programmée`,
+        message: `Votre course pour le ${new Date(scheduledTime).toLocaleString()} a été enregistrée.`,
         type: "ride_scheduled",
         reference: ride._id,
         referenceModel: "Ride",
@@ -79,11 +84,13 @@ export const requestRide = async (req, res, next) => {
       return;
     }
 
+
     const nearbyDrivers = await findNearbyDrivers(
       pickup.location.coordinates,
       vehicleType,
     );
 
+   
     if (nearbyDrivers.length === 0) {
       ride.status = "noDriver";
       await ride.save();
@@ -105,39 +112,70 @@ export const requestRide = async (req, res, next) => {
       });
     }
 
+
     ride.status = "searching";
     await ride.save();
 
+    console.log(` Traitement de ${nearbyDrivers.length} chauffeur(s)`);
+
+    
     for (const driver of nearbyDrivers) {
-      await createNotification({
-        recipient: driver.user,
-        title: "Nouvelle demande de course",
-        message: `Nouvelle course de ${pickup.address} vers ${destination.address}`,
-        type: "ride_request",
-        reference: ride._id,
-        referenceModel: "Ride",
-        data: {
+      try {
+
+        if (!driver.user || !driver.user._id) {
+          console.log(` Le chauffeur ${driver._id} n'a pas d'utilisateur associé.`);
+          continue;
+        }
+        console.log(' Données chauffeur :', {
+          driverId: driver._id,
+          userId: driver.user,
+          userType: typeof driver.user
+        });
+
+        const driverUserId = driver.user._id || driver.user;
+
+        console.log(` Création de notification pour le chauffeur : ${driverUserId}`);
+
+        const notificationResult = await createNotification({
+          recipient: driverUserId,
+          title: "Nouvelle demande de course",
+          message: `Nouvelle course de ${pickup.address} vers ${destination.address}`,
+          type: "ride_request",
+          reference: ride._id,
+          referenceModel: "Ride",
+          data: {
+            rideId: ride._id,
+            pickup: ride.pickup,
+            destination: ride.destination,
+            price: ride.price.total,
+            distance: ride.distance,
+            duration: ride.duration,
+          },
+        });
+
+        if (notificationResult) {
+          console.log(` Notification créée avec succès pour ${driverUserId}`);
+        } else {
+          console.log(` Échec de création de notification pour ${driverUserId}`);
+        }
+
+       
+        sendToUser(driverUserId.toString(), "new_ride_request", {
           rideId: ride._id,
           pickup: ride.pickup,
           destination: ride.destination,
           price: ride.price.total,
           distance: ride.distance,
           duration: ride.duration,
-        },
-      });
+        });
 
-
-
-      sendToUser(driver.user?.toString?.(), "new_ride_request", {
-        rideId: ride._id,
-        pickup: ride.pickup,
-        destination: ride.destination,
-        price: ride.price.total,
-        distance: ride.distance,
-        duration: ride.duration,
-      });
+      } catch (driverError) {
+        console.error(` Erreur avec le chauffeur ${driver._id}:`, driverError);
+        continue;
+      }
     }
 
+ 
     sendToUser(req.user.id, "ride_searching", {
       rideId: ride._id,
       driversFound: nearbyDrivers.length,
@@ -150,6 +188,7 @@ export const requestRide = async (req, res, next) => {
       driversFound: nearbyDrivers.length,
     });
   } catch (error) {
+    console.error(' Erreur dans requestRide:', error);
     next(error);
   }
 };
