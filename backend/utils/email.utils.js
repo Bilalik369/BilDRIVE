@@ -89,3 +89,34 @@ export const sendPasswordResetEmail = async (email, token) => {
     return false
   }
 }
+
+export const sendNotificationEmail = async (email, subject, htmlMessage) => {
+  try {
+    const mailOptions = {
+      from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
+      to: email,
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+            ${htmlMessage}
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+              Cordialement,<br>
+              L'équipe Bildrive
+            </p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending notification email:", error);
+    return false;
+  }
+};

@@ -8,7 +8,6 @@ import { getDistance, getDirections } from "../utils/maps.utils.js";
 import { findNearbyDrivers } from "../utils/driver.utils.js";
 import { createNotification } from "../utils/notification.utils.js";
 import { sendToUser, sendToDrivers } from "../utils/realtime.utils.js";
-// import { sendPushNotification } from "../utils/firebase.utils.js"
 
 export const requestRide = async (req, res, next) => {
   try {
@@ -127,19 +126,9 @@ export const requestRide = async (req, res, next) => {
         },
       });
 
-      await sendPushNotification(driver.user.toString(), {
-        title: "Nouvelle demande de course",
-        body: `Course de ${pickup.address} vers ${destination.address} - €${ride.price.total}`,
-        data: {
-          type: "ride_request",
-          rideId: ride._id.toString(),
-          pickup: JSON.stringify(ride.pickup),
-          destination: JSON.stringify(ride.destination),
-          price: ride.price.total.toString(),
-        },
-      });
 
-      sendToUser(driver.user.toString(), "new_ride_request", {
+
+      sendToUser(driver.user?.toString?.(), "new_ride_request", {
         rideId: ride._id,
         pickup: ride.pickup,
         destination: ride.destination,
@@ -217,17 +206,7 @@ export const acceptRide = async (req, res, next) => {
       },
     });
 
-    await sendPushNotification(ride.passenger._id.toString(), {
-      title: "Course acceptée",
-      body: `${driver.user.firstName} a accepté votre course`,
-      data: {
-        type: "ride_accepted",
-        rideId: ride._id.toString(),
-        driverId: driver._id.toString(),
-        driverName: driver.user.firstName + " " + driver.user.lastName,
-        driverPhone: driver.user.phone,
-      },
-    });
+
 
     sendToUser(ride.passenger._id.toString(), "ride_accepted", {
       rideId: ride._id,
@@ -284,14 +263,7 @@ export const arrivedAtPickup = async (req, res, next) => {
       referenceModel: "Ride",
     });
 
-    await sendPushNotification(ride.passenger._id.toString(), {
-      title: "Chauffeur arrivé",
-      body: "Votre chauffeur est arrivé au point de prise en charge",
-      data: {
-        type: "ride_arrived",
-        rideId: ride._id.toString(),
-      },
-    });
+
 
     sendToUser(ride.passenger._id.toString(), "driver_arrived", {
       rideId: ride._id,
@@ -339,14 +311,7 @@ export const startRide = async (req, res, next) => {
       referenceModel: "Ride",
     });
 
-    await sendPushNotification(ride.passenger._id.toString(), {
-      title: "Course commencée",
-      body: "Votre course a commencé",
-      data: {
-        type: "ride_started",
-        rideId: ride._id.toString(),
-      },
-    });
+
 
     sendToUser(ride.passenger._id.toString(), "ride_started", {
       rideId: ride._id,
@@ -454,15 +419,7 @@ export const completeRide = async (req, res, next) => {
     })
 
     
-    await sendPushNotification(ride.passenger._id.toString(), {
-      title: "Course terminée",
-      body: "Votre course s'est terminée avec succès",
-      data: {
-        type: "ride_completed",
-        rideId: ride._id.toString(),
-        paymentStatus: ride.payment.status,
-      },
-    })
+
 
     sendToUser(ride.passenger._id.toString(), "ride_completed", {
       rideId: ride._id,
@@ -527,15 +484,7 @@ export const cancelRide = async (req, res, next) => {
       })
 
  
-      await sendPushNotification(ride.passenger._id.toString(), {
-        title: "Course annulée",
-        body: "Votre course a été annulée par le chauffeur",
-        data: {
-          type: "ride_cancelled",
-          rideId: ride._id.toString(),
-          reason: reason || "Annulée par le chauffeur",
-        },
-      })
+
 
     
       sendToUser(ride.passenger._id.toString(), "ride_cancelled", {
@@ -564,15 +513,7 @@ export const cancelRide = async (req, res, next) => {
       })
 
     
-      await sendPushNotification(rideDriver.user.toString(), {
-        title: "Course annulée",
-        body: "Une course a été annulée par le passager",
-        data: {
-          type: "ride_cancelled",
-          rideId: ride._id.toString(),
-          reason: reason || "Annulée par le passager",
-        },
-      })
+
 
       
       sendToUser(rideDriver.user.toString(), "ride_cancelled", {
@@ -801,8 +742,3 @@ export const rateRide = async (req, res, next) => {
     next(error)
   }
 }
-
-
-
-
-
