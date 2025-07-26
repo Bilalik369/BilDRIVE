@@ -27,7 +27,7 @@ export const requestRide = async (req, res, next) => {
       destination.location.coordinates,
     );
 
-    n
+
     const routeInfo = await getDirections(
       pickup.location.coordinates,
       destination.location.coordinates,
