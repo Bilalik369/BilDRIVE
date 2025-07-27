@@ -1,3 +1,7 @@
+
+// plus de detille pour les notification
+
+
 import Ride from "../models/ride.model.js";
 import Driver from "../models/driver.model.js";
 import User from "../models/user.model.js";
@@ -481,6 +485,8 @@ export const completeRide = async (req, res, next) => {
     next(error)
   }
 }
+
+
 export const cancelRide = async (req, res, next) => {
   try {
     const { rideId } = req.params
