@@ -120,3 +120,51 @@ export const sendNotificationEmail = async (email, subject, htmlMessage) => {
     return false;
   }
 };
+
+export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresseArrivee, prix, distance) => {
+  try {
+    const subject = "Nouvelle demande de course";
+
+    const htmlMessage = `
+      <div style="font-size: 16px; line-height: 1.6; color: #333;">
+        <p>Une nouvelle course a été demandée :</p>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 8px 0;"><strong>De :</strong> ${adresseDepart}</p>
+          <p style="margin: 8px 0;"><strong>Vers :</strong> ${adresseArrivee}</p>
+          <p style="margin: 8px 0;"><strong>Prix estimé :</strong> ${prix} DH</p>
+          <p style="margin: 8px 0;"><strong>Distance :</strong> ${distance} km</p>
+        </div>
+
+        <p>Connectez-vous à votre application pour accepter cette course.</p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
+      to: email,
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+            ${htmlMessage}
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+              Cordialement,<br>
+              L'équipe Bildrive
+            </p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending ride request email to driver:", error);
+    return false;
+  }
+};
