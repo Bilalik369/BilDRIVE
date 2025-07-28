@@ -237,23 +237,36 @@ export const acceptRide = async (req, res, next) => {
     driver.currentRide = ride._id;
     await driver.save();
 
-    await createNotification({
-      recipient: ride.passenger._id,
-      title: "Course acceptée",
-      message: `${driver.user.firstName} a accepté votre course`,
-      type: "ride_accepted",
-      reference: ride._id,
-      referenceModel: "Ride",
-      data: {
-        rideId: ride._id,
-        driverId: driver._id,
-        driverName: driver.user.firstName + " " + driver.user.lastName,
-        driverPhone: driver.user.phone,
-        driverRating: driver.user.rating,
-        vehicleInfo: driver.vehicle,
-        estimatedArrival: new Date(Date.now() + 10 * 60 * 1000),
-      },
-    });
+    
+    const driverFullName = driver.fullName || (driver.user.firstName + " " + driver.user.lastName);
+    const distance = ride.distance ? (ride.distance / 1000).toFixed(1) + " km" : "-";
+    const price = ride.price.total;
+ 
+const durationSeconds = ride.duration || 600; 
+const durationMinutes = Math.round(durationSeconds / 60);
+const estimatedDurationText = `${durationMinutes} minutes`;
+
+await createNotification({
+  recipient: ride.passenger._id,
+  title: "Course acceptée !",
+  message: `Votre course est confirmée !\n\n• Chauffeur : ${driverFullName}\n• Arrivée estimée : ${estimatedDurationText}\n• Distance : ${distance}\n• Prix total : ${price} DH\n\nVotre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !`,
+  type: "ride_accepted",
+  reference: ride._id,
+  referenceModel: "Ride",
+  data: {
+    rideId: ride._id,
+    driverId: driver._id,
+    driverName: driverFullName,
+    driverPhone: driver.user.phone,
+    driverRating: driver.user.rating,
+    vehicleInfo: driver.vehicle,
+    estimatedArrival: new Date(Date.now() + durationSeconds * 1000),
+    distance: distance,
+    price: price,
+  },
+});
+
+
 
 
 
@@ -671,7 +684,7 @@ export const getDriverRides = async (req, res, next) => {
     if (!driver) {
       return next(createError(404, "Chauffeur non trouvé"))
     }
-
+    
 
     const query = { driver: driver._id }
     if (status) {
