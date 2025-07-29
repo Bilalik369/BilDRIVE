@@ -169,19 +169,20 @@ export const sendRideAcceptedEmailToPassenger = async (email, chauffeur, arrivee
     const subject = "Course acceptée !";
 
     const htmlMessage = `
-      <div style="font-size: 16px; line-height: 1.6; color: #333;">
-        <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;"> Votre course est confirmée !</p>
-
-        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Chauffeur :</strong> ${chauffeur}</p>
-          <p style="margin: 8px 0;"><strong>Arrivée estimée :</strong> ${arriveeEstimee}</p>
-          <p style="margin: 8px 0;"><strong>Distance :</strong> ${distance}</p>
-          <p style="margin: 8px 0;"><strong>Prix total :</strong> ${prix} DH</p>
-        </div>
-
-        <p>Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !</p>
+    <div style="font-size: 16px; line-height: 1.6; color: #333;">
+      <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;"> Votre course est confirmée !</p>
+  
+      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Chauffeur :</strong> ${chauffeur}</p>
+        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Arrivée estimée :</strong> ${arriveeEstimee}</p>
+        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Distance :</strong> ${distance}</p>
+        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Prix total :</strong> ${prix} DH</p>
       </div>
-    `;
+  
+      <p>Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !</p>
+    </div>
+  `;
+  
 
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
