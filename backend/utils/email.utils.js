@@ -7,8 +7,6 @@ import nodemailer from "nodemailer";
 // console.log("EMAIL_SECURE:", process.env.EMAIL_SECURE);
 // console.log("EMAIL_USER:", process.env.EMAIL_USER);
 
-
-
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT), 
@@ -25,8 +23,6 @@ const transporter = nodemailer.createTransport({
 export const sendVerificationEmail = async (email, token) => {
   try {
     const verificationUrl = `http://localhost:5000/api/auth/verify-email/${token}`
-
-
 
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
@@ -56,10 +52,8 @@ export const sendVerificationEmail = async (email, token) => {
   }
 };
 
-
 export const sendPasswordResetEmail = async (email, token) => {
   try {
-    
     const resetUrl = `http://localhost:5000/api/auth/reset-password/${token}`
 
     const mailOptions = {
@@ -165,6 +159,55 @@ export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresse
     return true;
   } catch (error) {
     console.error("Error sending ride request email to driver:", error);
+    return false;
+  }
+};
+
+
+export const sendRideAcceptedEmailToPassenger = async (email, chauffeur, arriveeEstimee, distance, prix) => {
+  try {
+    const subject = "Course acceptée !";
+
+    const htmlMessage = `
+      <div style="font-size: 16px; line-height: 1.6; color: #333;">
+        <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;"> Votre course est confirmée !</p>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Chauffeur :</strong> ${chauffeur}</p>
+          <p style="margin: 8px 0;"><strong>Arrivée estimée :</strong> ${arriveeEstimee}</p>
+          <p style="margin: 8px 0;"><strong>Distance :</strong> ${distance}</p>
+          <p style="margin: 8px 0;"><strong>Prix total :</strong> ${prix} DH</p>
+        </div>
+
+        <p>Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !</p>
+      </div>
+    `;
+
+    const mailOptions = {
+      from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
+      to: email,
+      subject: subject,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
+          </div>
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+            ${htmlMessage}
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+              Cordialement,<br>
+              L'équipe Bildrive
+            </p>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error("Error sending ride accepted email to passenger:", error);
     return false;
   }
 };

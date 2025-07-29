@@ -203,6 +203,7 @@ export const requestRide = async (req, res, next) => {
 };
 
 
+
 export const acceptRide = async (req, res, next) => {
   try {
     const { rideId } = req.params;
@@ -237,38 +238,45 @@ export const acceptRide = async (req, res, next) => {
     driver.currentRide = ride._id;
     await driver.save();
 
-    
     const driverFullName = driver.fullName || (driver.user.firstName + " " + driver.user.lastName);
     const distance = ride.distance ? (ride.distance / 1000).toFixed(1) + " km" : "-";
     const price = ride.price.total;
- 
-const durationSeconds = ride.duration || 600; 
-const durationMinutes = Math.round(durationSeconds / 60);
-const estimatedDurationText = `${durationMinutes} minutes`;
+    const durationSeconds = ride.duration || 600;
+    const durationMinutes = Math.round(durationSeconds / 60);
+    const estimatedDurationText = `${durationMinutes} minutes`;
 
-await createNotification({
-  recipient: ride.passenger._id,
-  title: "Course acceptée !",
-  message: `Votre course est confirmée !\n\n• Chauffeur : ${driverFullName}\n• Arrivée estimée : ${estimatedDurationText}\n• Distance : ${distance}\n• Prix total : ${price} DH\n\nVotre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !`,
-  type: "ride_accepted",
-  reference: ride._id,
-  referenceModel: "Ride",
-  data: {
-    rideId: ride._id,
-    driverId: driver._id,
-    driverName: driverFullName,
-    driverPhone: driver.user.phone,
-    driverRating: driver.user.rating,
-    vehicleInfo: driver.vehicle,
-    estimatedArrival: new Date(Date.now() + durationSeconds * 1000),
-    distance: distance,
-    price: price,
-  },
-});
-
-
-
-
+  
+    await createNotification({
+      recipient: ride.passenger._id,
+      title: "Course acceptée !",
+      message: `Votre course est confirmée ! Chauffeur : ${driverFullName} Arrivée estimée : ${estimatedDurationText} Distance : ${distance} Prix total : ${price} DH Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !`,
+      type: "ride_accepted",
+      reference: ride._id,
+      referenceModel: "Ride",
+      data: {
+        rideId: ride._id,
+        driverId: driver._id,
+        driverName: driverFullName,
+        driverPhone: driver.user.phone,
+        driverRating: driver.user.rating,
+        vehicleInfo: driver.vehicle,
+        estimatedArrival: new Date(Date.now() + durationSeconds * 1000),
+        distance: distance,
+        price: price,
+        
+        displayData: {
+          title: "Course acceptée !",
+          subtitle: ` Votre course est confirmée !`,
+          details: [
+            { label: "Chauffeur", value: driverFullName, highlight: true },
+            { label: "Arrivée estimée", value: estimatedDurationText },
+            { label: "Distance", value: distance },
+            { label: "Prix total", value: `${price} DH` }
+          ],
+          footer: "Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !"
+        }
+      },
+    });
 
     sendToUser(ride.passenger._id.toString(), "ride_accepted", {
       rideId: ride._id,

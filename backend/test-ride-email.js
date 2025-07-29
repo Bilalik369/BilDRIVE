@@ -6,7 +6,7 @@ async function testRideRequestEmail() {
     console.log("Testing ride request email for driver...");
     
     const result = await sendRideRequestEmailToDriver(
-      "jawadbouzir01@gmail.com", 
+      "bilal11iken@gmail.com", 
       "123 Avenue Mohammed V, Casablanca",
       "456 Boulevard Hassan II, Rabat", 
       "250",
