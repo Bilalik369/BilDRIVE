@@ -1,6 +1,10 @@
 import Notification from "../models/notification.model.js";
 import User from "../models/user.model.js";
-import { sendNotificationEmail, sendRideRequestEmailToDriver, sendRideAcceptedEmailToPassenger } from "./email.utils.js";
+import { 
+  sendNotificationEmail, 
+  sendRideRequestEmailToDriver, 
+  sendRideAcceptedEmailToPassenger 
+} from "./email.utils.js";
 
 export const createNotification = async (notificationData) => {
   try {
@@ -24,24 +28,21 @@ export const createNotification = async (notificationData) => {
             formattedPrice,
             distanceInKm
           );
-        } else if (notificationData.type === "ride_accepted" && notificationData.data) {
-
-          const { driverName, distance, price } = notificationData.data;
-          const { displayData } = notificationData.data;
           
-          if (displayData && displayData.details) {
-            const arriveeEstimee = displayData.details.find(d => d.label === "Arrivée estimée")?.value || "11 minutes";
-            
-            await sendRideAcceptedEmailToPassenger(
-              user.email,
-              driverName,
-              arriveeEstimee,
-              distance,
-              price
-            );
-          }
+        } else if (notificationData.type === "ride_accepted" && notificationData.data?.emailData) {
+      
+          const { chauffeur, arriveeEstimee, distance, prix } = notificationData.data.emailData;
+          
+          await sendRideAcceptedEmailToPassenger(
+            user.email,
+            chauffeur,
+            arriveeEstimee,
+            distance,
+            prix
+          );
+          
         } else {
-     
+       
           await sendNotificationEmail(
             user.email,
             notificationData.title,

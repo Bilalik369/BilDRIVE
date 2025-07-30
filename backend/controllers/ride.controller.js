@@ -210,7 +210,7 @@ export const acceptRide = async (req, res, next) => {
 
     const ride = await Ride.findById(rideId).populate(
       "passenger",
-      "firstName lastName phone",
+      "firstName lastName phone email",
     );
     if (!ride) {
       return next(createError(404, "Course non trouvée"));
@@ -229,6 +229,7 @@ export const acceptRide = async (req, res, next) => {
       return next(createError(400, "Chauffeur non disponible"));
     }
 
+    
     ride.driver = driver._id;
     ride.status = "accepted";
     ride.acceptedAt = new Date();
@@ -245,11 +246,18 @@ export const acceptRide = async (req, res, next) => {
     const durationMinutes = Math.round(durationSeconds / 60);
     const estimatedDurationText = `${durationMinutes} minutes`;
 
-  
+
+    const rideAcceptanceData = {
+      chauffeur: driverFullName,
+      arriveeEstimee: estimatedDurationText,
+      distance: distance,
+      prix: price
+    };
+
     await createNotification({
       recipient: ride.passenger._id,
       title: "Course acceptée !",
-      message: `Votre course est confirmée ! Chauffeur : ${driverFullName} Arrivée estimée : ${estimatedDurationText} Distance : ${distance} Prix total : ${price} DH Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !`,
+      message: `Votre course est confirmée ! Chauffeur : ${driverFullName}`,
       type: "ride_accepted",
       reference: ride._id,
       referenceModel: "Ride",
@@ -261,22 +269,11 @@ export const acceptRide = async (req, res, next) => {
         driverRating: driver.user.rating,
         vehicleInfo: driver.vehicle,
         estimatedArrival: new Date(Date.now() + durationSeconds * 1000),
-        distance: distance,
-        price: price,
-        
-        displayData: {
-          title: "Course acceptée !",
-          subtitle: ` Votre course est confirmée !`,
-          details: [
-            { label: "Chauffeur", value: driverFullName, highlight: true },
-            { label: "Arrivée estimée", value: estimatedDurationText },
-            { label: "Distance", value: distance },
-            { label: "Prix total", value: `${price} DH` }
-          ],
-          footer: "Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !"
-        }
+     
+        emailData: rideAcceptanceData
       },
     });
+
 
     sendToUser(ride.passenger._id.toString(), "ride_accepted", {
       rideId: ride._id,
