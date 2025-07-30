@@ -121,13 +121,13 @@ export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresse
 
     const htmlMessage = `
       <div style="font-size: 16px; line-height: 1.6; color: #333;">
-        <p>Une nouvelle course a été demandée :</p>
+        <p style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Une nouvelle course a été demandée !</p>
 
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 8px 0;"><strong>De :</strong> ${adresseDepart}</p>
-          <p style="margin: 8px 0;"><strong>Vers :</strong> ${adresseArrivee}</p>
-          <p style="margin: 8px 0;"><strong>Prix estimé :</strong> ${prix} DH</p>
-          <p style="margin: 8px 0;"><strong>Distance :</strong> ${distance} km</p>
+          <p style="margin: 8px 0;"><strong style="color: #9929EA;">De :</strong> ${adresseDepart}</p>
+          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Vers :</strong> ${adresseArrivee}</p>
+          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Prix estimé :</strong> ${prix} DH</p>
+          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Distance :</strong> ${distance} km</p>
         </div>
 
         <p>Connectez-vous à votre application pour accepter cette course.</p>
