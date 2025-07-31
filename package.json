@@ -23,5 +23,8 @@
     "socket.io": "^4.8.1",
     "stripe": "^18.3.0",
     "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
   }
 }
