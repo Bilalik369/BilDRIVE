@@ -48,7 +48,7 @@ export const register = async (req, res, next) => {
       email,
       password,
       phone,
-      role: role || "passenger",
+      role: role ,
       verificationToken,
       verificationTokenExpires,
     });
