@@ -14,7 +14,7 @@
     ...props
   }) => {
     const baseClasses =
-      "font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+      "font-medium rounded-full transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
 
     const variants = {
       primary: "bg-primary text-white hover:bg-primary/90 active:bg-primary/80 disabled:bg-primary/50",
@@ -39,6 +39,10 @@
         className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${
           isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
         } ${className}`}
+        style={{
+          borderRadius: '20px',
+          outline: '0 !important'
+        }}
         disabled={isDisabled}
         onClick={onClick}
         {...props}

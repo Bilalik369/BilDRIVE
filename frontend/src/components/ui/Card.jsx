@@ -7,6 +7,10 @@ const Card = ({ children, className = "", padding = "p-6", shadow = "shadow-md",
           ${hover ? "hover:shadow-lg transition-shadow duration-200" : ""}
           ${className}
         `}
+        style={{
+          borderRadius: '10px',
+          boxSizing: 'border-box'
+        }}
         {...props}
       >
         {children}
