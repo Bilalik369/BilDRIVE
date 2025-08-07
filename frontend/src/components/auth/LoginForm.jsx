@@ -36,14 +36,14 @@ const LoginForm = () => {
   useEffect(() => {
     const verified = searchParams.get("verified")
     if (verified === "true") {
-      toast.success("Email verified successfully! You can now log in.")
+      toast.success("Email vérifié avec succès ! Vous pouvez maintenant vous connecter.")
     }
   }, [searchParams])
 
   const onSubmit = async (data) => {
     try {
       const result = await dispatch(loginUser(data)).unwrap()
-      toast.success("Login successful!")
+      toast.success("Connexion réussie !")
 
      
       if (result.user.role === "driver") {
@@ -58,13 +58,13 @@ const LoginForm = () => {
 
   const handleResendVerification = async () => {
     if (!resendEmail) {
-      toast.error("Please enter your email address")
+      toast.error("Veuillez saisir votre adresse email")
       return
     }
     
     try {
       await dispatch(resendVerificationEmail(resendEmail)).unwrap()
-      toast.success("Verification email sent successfully! Please check your inbox.")
+      toast.success("Email de vérification envoyé avec succès ! Vérifiez votre boîte de réception.")
       setShowResendForm(false)
       setResendEmail("")
     } catch (error) {

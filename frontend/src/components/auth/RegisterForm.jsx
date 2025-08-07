@@ -59,7 +59,7 @@ const RegisterForm = () => {
       const result = await dispatch(registerUser(submitData)).unwrap()
       console.log("Frontend - registration result:", result)
       
-      toast.success("Registration successful! Please check your email for verification before logging in.")
+      toast.success("Inscription réussie ! Veuillez vérifier votre email avant de vous connecter.")
       
       // Redirect to login page after successful registration
       navigate("/auth/login")

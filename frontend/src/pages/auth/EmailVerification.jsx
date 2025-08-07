@@ -19,12 +19,12 @@ const EmailVerification = () => {
       try {
         await dispatch(verifyEmail(token)).unwrap()
         setStatus("success")
-        setMessage("Email verified successfully! You can now log in to your account.")
-        toast.success("Email verified successfully!")
+        setMessage("Email vérifié avec succès ! Vous pouvez maintenant vous connecter à votre compte.")
+        toast.success("Email vérifié avec succès !")
       } catch (error) {
         setStatus("error")
-        setMessage(error || "Email verification failed. The link may be invalid or expired.")
-        toast.error("Email verification failed")
+        setMessage(error || "Échec de la vérification de l'email. Le lien peut être invalide ou expiré.")
+        toast.error("Échec de la vérification de l'email")
       }
     }
 

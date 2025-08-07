@@ -5,8 +5,9 @@ import { store } from "./redux/store";
 import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import EmailVerification from "./pages/auth/EmailVerification";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
-
 
 const Dashboard = () => (
   <div className="min-h-screen bg-bg-main p-8">
@@ -34,6 +35,8 @@ function App() {
           {/* Public routes */}
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
           <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
           
           {/* Protected routes */}

@@ -104,7 +104,7 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: "Registration successful! Please check your email for verification before logging in.",
+      message: "Inscription réussie ! Veuillez vérifier votre email avant de vous connecter.",
       user: userWithoutPassword,
     });
   } catch (error) {
@@ -245,22 +245,22 @@ export const login = async(req , res , next)=>{
   try{
     const {email , password} = req.body;
     if(!email || !password){
-      return next(createError(401, "toute le champ oblogatoire"))
+      return next(createError(401, "Tous les champs sont obligatoires"))
     }
 
     const user = await User.findOne({email}).select("+password")
     if(!user){
-      return next(createError(401 , "Invalid email or password"))
+      return next(createError(401 , "Email ou mot de passe invalide"))
     }
 
     const isPasswordValide = await user.comparePassword(password)
     if(!isPasswordValide){
-      return next(createError(401 , "Invalid email or password"))
+      return next(createError(401 , "Email ou mot de passe invalide"))
     }
 
     // Check if user is verified
     if (!user.isVerified) {
-      return next(createError(403, "Please verify your email before logging in. Check your inbox for a verification link."))
+      return next(createError(403, "Veuillez vérifier votre email avant de vous connecter. Vérifiez votre boîte de réception pour le lien de vérification."))
     }
 
     user.lastLogin = Date.now();
@@ -275,7 +275,7 @@ export const login = async(req , res , next)=>{
 
     res.status(201).json({
       success: true,
-      message: "Login successful",
+      message: "Connexion réussie",
       token,
       user: userWithoutPassword,
     })
@@ -296,7 +296,7 @@ export const verifyEmail = async (req, res, next) => {
     })
 
     if (!user) {
-      return next(createError(400, "Invalid or expired verification token"))
+      return next(createError(400, "Token de vérification invalide ou expiré"))
     }
 
     user.isVerified = true
@@ -310,10 +310,10 @@ export const verifyEmail = async (req, res, next) => {
       res.redirect(`${frontendUrl}/auth/login?verified=true`)
     } else {
       // If it's a POST request (from frontend API call), return JSON
-      res.status(200).json({
-        success: true,
-        message: "Email verified successfully",
-      })
+          res.status(200).json({
+      success: true,
+      message: "Email vérifié avec succès",
+    })
     }
   } catch (error) {
     next(error)
@@ -326,14 +326,14 @@ export const resendVerificationEmail = async(req , res , next)=>{
     const {email} = req.body;
 
     if (!email) {
-      return next(createError(400, "Email is required"))
+      return next(createError(400, "L'email est requis"))
     }
     const user = await User.findOne({email})
     if(!user){
-      return next(createError(404 , "User not find"))
+      return next(createError(404 , "Utilisateur non trouvé"))
     }
     if(user.isVerified){
-      return next(createError(404 , "User already verfied"))
+      return next(createError(404 , "Utilisateur déjà vérifié"))
     }
 
 
@@ -348,7 +348,7 @@ export const resendVerificationEmail = async(req , res , next)=>{
     
     res.status(201).json({
       success: true,
-      message: "Verification email sent successfully",
+      message: "Email de vérification envoyé avec succès",
     })
   } catch (error) {
     next(error)
@@ -360,13 +360,13 @@ export const forgotPassword = async(req , res , next)=>{
   try{
     const {email} = req.body;
     if(!email){
-      return next(createError(400 , "Email is required "))
+      return next(createError(400 , "L'email est requis"))
 
     }
 
     const user = await User.findOne({email})
     if(!user){
-      return next(createError(404 , "User not fond"))
+      return next(createError(404 , "Utilisateur non trouvé"))
 
     }
 
@@ -384,7 +384,7 @@ export const forgotPassword = async(req , res , next)=>{
 
     res.status(200).json({
       success: true,
-      message: "Password reset email sent successfully",
+      message: "Email de réinitialisation de mot de passe envoyé avec succès",
     })
   }catch(error){
     next(error)
@@ -404,7 +404,7 @@ export const resetPassword = async (req, res, next) => {
     })
 
     if (!user) {
-      return next(createError(400, "Invalid or expired reset token"))
+      return next(createError(400, "Token de réinitialisation invalide ou expiré"))
     }
 
  
@@ -415,7 +415,7 @@ export const resetPassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Password reset successfully",
+      message: "Mot de passe réinitialisé avec succès",
     })
   } catch (error) {
     next(error)
@@ -466,7 +466,7 @@ export const socialLogin = async(req , res , next)=>{
 
     res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: "Connexion réussie",
       token: jwtToken,
       user,
     });
@@ -482,7 +482,7 @@ export const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id)
     if (!user) {
-      return next(createError(404, "User not found"))
+      return next(createError(404, "Utilisateur non trouvé"))
     }
 
     res.status(200).json({
@@ -501,13 +501,13 @@ export const changePassword = async (req, res, next) => {
     
     const user = await User.findById(req.user.id).select("+password")
     if (!user) {
-      return next(createError(404, "User not found"))
+      return next(createError(404, "Utilisateur non trouvé"))
     }
 
     
     const isPasswordValid = await user.comparePassword(currentPassword)
     if (!isPasswordValid) {
-      return next(createError(401, "Current password is incorrect"))
+      return next(createError(401, "Le mot de passe actuel est incorrect"))
     }
 
   
@@ -516,7 +516,7 @@ export const changePassword = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: "Password changed successfully",
+      message: "Mot de passe modifié avec succès",
     })
   } catch (error) {
     next(error)
@@ -527,6 +527,6 @@ export const changePassword = async (req, res, next) => {
 export const logout = (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Logged out successfully",
+    message: "Déconnexion réussie",
   })
 }
