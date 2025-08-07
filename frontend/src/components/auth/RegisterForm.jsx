@@ -47,7 +47,6 @@ const RegisterForm = () => {
 
   const onSubmit = async (data) => {
     try {
-      
       const submitData = {
         ...data,
         role: userType
@@ -60,17 +59,12 @@ const RegisterForm = () => {
       const result = await dispatch(registerUser(submitData)).unwrap()
       console.log("Frontend - registration result:", result)
       
-      toast.success("Registration successful! Please check your email for verification.")
-
+      toast.success("Registration successful! Please check your email for verification before logging in.")
       
-      if (result.user.role === "driver") {
-        navigate("/driver/dashboard")
-      } else {
-        navigate("/dashboard")
-      }
+      // Redirect to login page after successful registration
+      navigate("/auth/login")
     } catch (error) {
       console.error("Frontend - registration error:", error)
-    
     }
   }
 

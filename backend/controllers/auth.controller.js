@@ -97,18 +97,14 @@ export const register = async (req, res, next) => {
 
     await sendVerificationEmail(user.email , verificationToken)
 
-    const token = user.generateAuthToken();
-    
     const userWithoutPassword = { ...user.toObject() }
     delete userWithoutPassword.password
     delete userWithoutPassword.verificationToken
     delete userWithoutPassword.verificationTokenExpires
 
-
     res.status(201).json({
       success: true,
-      message: "Utilisateur enregistré avec succès. Veuillez vérifier votre email.",
-      token, 
+      message: "Registration successful! Please check your email for verification before logging in.",
       user: userWithoutPassword,
     });
   } catch (error) {
@@ -259,13 +255,15 @@ export const login = async(req , res , next)=>{
 
     const isPasswordValide = await user.comparePassword(password)
     if(!isPasswordValide){
-
       return next(createError(401 , "Invalid email or password"))
+    }
 
+    // Check if user is verified
+    if (!user.isVerified) {
+      return next(createError(403, "Please verify your email before logging in. Check your inbox for a verification link."))
     }
 
     user.lastLogin = Date.now();
-
     await user.save();
 
     const token = user.generateAuthToken();
@@ -275,7 +273,6 @@ export const login = async(req , res , next)=>{
     delete userWithoutPassword.verificationToken
     delete userWithoutPassword.verificationTokenExpires
 
-
     res.status(201).json({
       success: true,
       message: "Login successful",
@@ -283,11 +280,9 @@ export const login = async(req , res , next)=>{
       user: userWithoutPassword,
     })
 
-
   }catch(error){
-  next(error)
+    next(error)
   }
-  
 }
 
 
@@ -295,7 +290,6 @@ export const verifyEmail = async (req, res, next) => {
   try {
     const { token } = req.params
 
-    
     const user = await User.findOne({
       verificationToken: token,
       verificationTokenExpires: { $gt: new Date()},
@@ -310,10 +304,17 @@ export const verifyEmail = async (req, res, next) => {
     user.verificationTokenExpires = undefined
     await user.save()
 
-    res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-    })
+    // If it's a GET request (from email link), redirect to frontend
+    if (req.method === 'GET') {
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+      res.redirect(`${frontendUrl}/auth/login?verified=true`)
+    } else {
+      // If it's a POST request (from frontend API call), return JSON
+      res.status(200).json({
+        success: true,
+        message: "Email verified successfully",
+      })
+    }
   } catch (error) {
     next(error)
   }

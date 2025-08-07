@@ -1,21 +1,22 @@
-"use client"
-
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { toast } from "react-hot-toast"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
-import { loginUser, clearError } from "../../redux/slices/authSlice"
+import { loginUser, clearError, resendVerificationEmail } from "../../redux/slices/authSlice"
 // import SocialLogin from "./SocialLogin"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
+  const [showResendForm, setShowResendForm] = useState(false)
+  const [resendEmail, setResendEmail] = useState("")
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { loading, error } = useSelector((state) => state.auth)
 
   const {
@@ -31,6 +32,14 @@ const LoginForm = () => {
     }
   }, [error, dispatch])
 
+  // Check for verification success message
+  useEffect(() => {
+    const verified = searchParams.get("verified")
+    if (verified === "true") {
+      toast.success("Email verified successfully! You can now log in.")
+    }
+  }, [searchParams])
+
   const onSubmit = async (data) => {
     try {
       const result = await dispatch(loginUser(data)).unwrap()
@@ -44,6 +53,22 @@ const LoginForm = () => {
       }
     } catch (error) {
       
+    }
+  }
+
+  const handleResendVerification = async () => {
+    if (!resendEmail) {
+      toast.error("Please enter your email address")
+      return
+    }
+    
+    try {
+      await dispatch(resendVerificationEmail(resendEmail)).unwrap()
+      toast.success("Verification email sent successfully! Please check your inbox.")
+      setShowResendForm(false)
+      setResendEmail("")
+    } catch (error) {
+      // Error is already handled by the slice
     }
   }
 
@@ -141,6 +166,41 @@ const LoginForm = () => {
                 Sign up here
               </Link>
             </p>
+            
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => setShowResendForm(!showResendForm)}
+                className="text-sm text-primary hover:text-text-primary font-medium"
+              >
+                Need to resend verification email?
+              </button>
+            </div>
+
+            {showResendForm && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-text-secondary mb-3">
+                  Enter your email address to receive a new verification link
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={resendEmail}
+                    onChange={(e) => setResendEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className="flex-1 px-3 py-2 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                  <Button
+                    type="button"
+                    onClick={handleResendVerification}
+                    size="sm"
+                    className="px-4"
+                  >
+                    Resend
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
       </div>

@@ -22,7 +22,8 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (email, token) => {
   try {
-    const verificationUrl = `http://localhost:5000/api/auth/verify-email/${token}`
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    const verificationUrl = `${frontendUrl}/auth/verify-email/${token}`
 
     const subject = "Vérifiez votre adresse email";
 

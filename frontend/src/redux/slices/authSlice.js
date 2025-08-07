@@ -15,7 +15,7 @@ export const loginUser = createAsyncThunk("auth/login", async ({ email, password
 export const registerUser = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
   try {
     const response = await authApi.register(userData)
-    localStorage.setItem("token", response.data.token)
+    // Don't store token on registration - user needs to verify email first
     return response.data
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Registration failed")
@@ -28,6 +28,24 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (_, 
     return response.data
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Failed to get user")
+  }
+})
+
+export const verifyEmail = createAsyncThunk("auth/verifyEmail", async (token, { rejectWithValue }) => {
+  try {
+    const response = await authApi.verifyEmail(token)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || "Email verification failed")
+  }
+})
+
+export const resendVerificationEmail = createAsyncThunk("auth/resendVerification", async (email, { rejectWithValue }) => {
+  try {
+    const response = await authApi.resendVerification(email)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || "Failed to resend verification email")
   }
 })
 
@@ -96,10 +114,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false
-        state.user = action.payload.user
-        state.token = action.payload.token
-        state.isAuthenticated = true
-        state.isEmailVerified = action.payload.user?.isVerified || false
+        state.user = null
+        state.token = null
+        state.isAuthenticated = false
+        state.isEmailVerified = false
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false
@@ -110,6 +128,12 @@ const authSlice = createSlice({
         state.user = action.payload.user
         state.isAuthenticated = true
         state.isEmailVerified = action.payload.user?.isVerified || false
+      })
+      .addCase(verifyEmail.fulfilled, (state, action) => {
+        state.isEmailVerified = true
+      })
+      .addCase(resendVerificationEmail.fulfilled, (state, action) => {
+       
       })
    
       .addCase(socialLogin.fulfilled, (state, action) => {
