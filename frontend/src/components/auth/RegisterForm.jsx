@@ -8,7 +8,7 @@ import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
 import { registerUser, clearError } from "../../redux/slices/authSlice"
-// import SocialLogin from "./SocialLogin"
+import SocialLogin from "./SocialLogin"
 
 const RegisterForm = () => {
   const [searchParams] = useSearchParams()
@@ -418,7 +418,7 @@ const RegisterForm = () => {
                 </div>
 
                 <div className="mt-6">
-                  {/* <SocialLogin /> */}
+                  <SocialLogin />
                 </div>
               </div>
 

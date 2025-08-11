@@ -8,7 +8,7 @@ import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
 import { loginUser, clearError, resendVerificationEmail } from "../../redux/slices/authSlice"
-// import SocialLogin from "./SocialLogin"
+import SocialLogin from "./SocialLogin"
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false)
@@ -155,7 +155,7 @@ const LoginForm = () => {
             </div>
 
             <div className="mt-6">
-              {/* <SocialLogin /> */}
+              <SocialLogin />
             </div>
           </div>
 
