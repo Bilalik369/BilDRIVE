@@ -171,33 +171,49 @@ const LoginForm = () => {
               <button
                 type="button"
                 onClick={() => setShowResendForm(!showResendForm)}
-                className="text-sm text-primary hover:text-text-primary font-medium"
+                className="text-sm text-primary hover:text-text-primary font-medium transition-colors duration-200"
               >
                 Need to resend verification email?
               </button>
             </div>
 
             {showResendForm && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-text-secondary mb-3">
-                  Enter your email address to receive a new verification link
-                </p>
-                <div className="flex gap-2">
-                  <input
+              <div className="mt-4 p-6 bg-card-bg border border-border-color rounded-xl">
+                <div className="text-center mb-4">
+                  <h3 className="text-lg font-semibold text-text-dark mb-2">Resend Verification Email</h3>
+                  <p className="text-sm text-text-secondary">
+                    Enter your email address to receive a new verification link
+                  </p>
+                </div>
+                
+                <div className="space-y-4">
+                  <Input
+                    label="Email Address"
                     type="email"
+                    placeholder="Enter your email address"
+                    icon={<Mail className="w-5 h-5" />}
                     value={resendEmail}
                     onChange={(e) => setResendEmail(e.target.value)}
-                    placeholder="Enter your email"
-                    className="flex-1 px-3 py-2 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   />
+                  
                   <Button
                     type="button"
                     onClick={handleResendVerification}
-                    size="sm"
-                    className="px-4"
+                    className="w-full"
+                    size="md"
                   >
-                    Resend
+                    Resend Verification Email
                   </Button>
+                </div>
+                
+                <div className="mt-4 pt-4 border-t border-border-color">
+                  <button
+                    type="button"
+                    onClick={() => setShowResendForm(false)}
+                    className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}
