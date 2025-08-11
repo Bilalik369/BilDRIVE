@@ -93,22 +93,56 @@ export const sendPasswordResetEmail = async (email, token) => {
     const frontendBase = process.env.FRONTEND_URL || "http://localhost:3000"
     const resetUrl = `${frontendBase}/auth/reset-password/${token}`
 
+    const subject = "Réinitialisez votre mot de passe";
+
+    const htmlMessage = `
+      <div style="font-size: 16px; line-height: 1.6; color: #333;">
+        <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;">Réinitialisation de mot de passe</p>
+
+        <p>Vous avez demandé une réinitialisation de votre mot de passe. Pour définir un nouveau mot de passe, veuillez cliquer sur le bouton ci-dessous.</p>
+
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 8px 0; text-align: center;">
+            <strong style="color: #9929EA;">Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe</strong>
+          </p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${resetUrl}" style="background-color: #28a745; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
+            Réinitialiser mon mot de passe
+          </a>
+        </div>
+
+        <p>Si le bouton ne fonctionne pas, vous pouvez copier et coller le lien suivant dans votre navigateur :</p>
+        <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace;">${resetUrl}</p>
+
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 8px; margin: 20px 0;">
+          <p style="margin: 0; color: #856404;">
+            <strong>Note :</strong> Ce lien expire dans 1 heure.
+          </p>
+        </div>
+
+        <p>Si vous n'avez pas demandé une réinitialisation de mot de passe, vous pouvez ignorer cet email en toute sécurité.</p>
+      </div>
+    `;
+
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
       to: email,
-      subject: "Reset Your Password",
+      subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2>Reset Your Password</h2>
-          <p>You requested a password reset. Please click the button below to set a new password:</p>
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">Reset Password</a>
+          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
-          <p>If the button doesn't work, you can also copy and paste the following link into your browser:</p>
-          <p>${resetUrl}</p>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request a password reset, you can safely ignore this email.</p>
-          <p>Best regards,<br>The Bildrive Team</p>
+          <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
+            ${htmlMessage}
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <p style="color: #666; font-size: 14px; margin: 0;">
+              Cordialement,<br>
+              L'équipe Bildrive
+            </p>
+          </div>
         </div>
       `,
     }
