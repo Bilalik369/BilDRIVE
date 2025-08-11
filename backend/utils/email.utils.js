@@ -89,7 +89,9 @@ export const sendVerificationEmail = async (email, token) => {
 
 export const sendPasswordResetEmail = async (email, token) => {
   try {
-    const resetUrl = `http://localhost:5000/api/auth/reset-password/${token}`
+    
+    const frontendBase = process.env.FRONTEND_URL || "http://localhost:3000"
+    const resetUrl = `${frontendBase}/auth/reset-password/${token}`
 
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,

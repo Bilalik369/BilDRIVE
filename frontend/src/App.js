@@ -6,6 +6,8 @@ import Register from "./pages/auth/Register";
 import Login from "./pages/auth/Login";
 import EmailVerification from "./pages/auth/EmailVerification";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 
 const Dashboard = () => (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password/:token" element={<ResetPassword />} />
           
           {/* Protected routes */}
           <Route 
@@ -54,7 +58,7 @@ function App() {
             } 
           />
           
-        
+          
           <Route path="/" element={<Login />} />
           <Route path="*" element={<div>Home or 404</div>} />
         </Routes>
