@@ -10,6 +10,19 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
+import Navbar from "./components/layout/Navbar"
+import Footer from "./components/layout/Footer"
+
+
+import Hero from "../src/components/landing/Hero"
+import Features from "../src/components/landing/Features"
+import About from "../src/components/landing/About"
+import HowItWorks from "../src/components/landing/HowItWorks"
+import Testimonials from "../src/components/landing/Testimonials"
+import Pricing from "../src/components/landing/Pricing"
+import Contact from "../src/components/landing/Contact"
+
+
 
 const Dashboard = () => (
   <div className="min-h-screen bg-bg-main p-8">
@@ -67,8 +80,14 @@ function App() {
     <GoogleOAuthProvider clientId={googleClientId}>
       <Provider store={store}>
         <Router>
+          <Navbar />
           <Routes>
             {/* Public routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/about" element={<LandingPage section="about" />} />
+            <Route path="/how-it-works" element={<LandingPage section="how-it-works" />} />
+            <Route path="/pricing" element={<LandingPage section="pricing" />} />
+            <Route path="/contact" element={<LandingPage section="contact" />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/verify-email/:token" element={<EmailVerification />} />
@@ -92,15 +111,37 @@ function App() {
                 </ProtectedRoute>
               } 
             />
-            
-            
-            <Route path="/" element={<Login />} />
+            {/* 404 */}
             <Route path="*" element={<div>Home or 404</div>} />
           </Routes>
+          <Footer />
         </Router>
       </Provider>
     </GoogleOAuthProvider>
   );
+}
+const LandingPage = ({ section }) => {
+  // Scroll to section when provided via route
+  React.useEffect(() => {
+    if (section) {
+      const el = document.getElementById(section)
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" })
+      }
+    }
+  }, [section])
+
+  return (
+    <div className="min-h-screen">
+      <Hero />
+      <Features />
+      <About />
+      <HowItWorks />
+      <Testimonials />
+      <Pricing />
+      <section id="contact"><Contact /></section>
+    </div>
+  )
 }
 
 export default App;

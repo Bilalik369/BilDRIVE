@@ -22,12 +22,13 @@ module.exports = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+
         primary: {
-          DEFAULT: "#9929EA",
+          DEFAULT: "#FF6500", 
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
+          DEFAULT: "#FF8C42", 
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
@@ -39,7 +40,7 @@ module.exports = {
           foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
+          DEFAULT: "#FF944D", 
           foreground: "hsl(var(--accent-foreground))",
         },
         popover: {
@@ -50,15 +51,15 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // ألوانك المخصصة
-        "text-primary": "#5E2A8A",
-        "text-secondary": "#7D4BC1",
-        "text-dark": "#3E1E5A",
-        "placeholder-text": "#BCA3D6",
-        "bg-main": "#F4ECFB",
-        "card-bg": "#E8D6FA",
-        "input-bg": "#F0E3FC",
-        "border-color": "#C792EF",
+
+        "text-primary": "#FF6500",
+        "text-secondary": "#FF944D",
+        "text-dark": "#4a2e00",
+        "placeholder-text": "#FFB380",
+        "bg-main": "#FFF4EC",
+        "card-bg": "#FFE0CC",
+        "input-bg": "#FFF0E0",
+        "border-color": "#FF944D",
         white: "#ffffff",
         black: "#000000",
       },

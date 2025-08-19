@@ -19,7 +19,12 @@ body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgb(var(--background-end-rgb))
+  )
+  rgb(var(--background-start-rgb));
 }
 
 a {
@@ -33,7 +38,7 @@ a {
   }
 }
 
-/* Custom scrollbar */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -43,15 +48,15 @@ a {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9929ea;
+  background: #FF6A00; 
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7d4bc1;
+  background: #FF4500; 
 }
 
-/* Loading animation */
+
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -62,7 +67,7 @@ a {
   animation: spin 1s linear infinite;
 }
 
-/* Fade in animation */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -78,7 +83,6 @@ a {
   animation: fadeIn 0.5s ease-out;
 }
 
-/* Slide in animation */
 @keyframes slideIn {
   from {
     opacity: 0;
