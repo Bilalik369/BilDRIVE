@@ -1,7 +1,3 @@
-
-// plus de detille pour les notification
-
-
 import Ride from "../models/ride.model.js";
 import Driver from "../models/driver.model.js";
 import User from "../models/user.model.js";

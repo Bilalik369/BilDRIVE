@@ -1,16 +1,10 @@
 import { Link } from "react-router-dom"
-import { ArrowRight, Star, Users, MapPin } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import Button from "../ui/Button"
 import Lottie from "lottie-react"
 import waitingCar from "../../assete/Man waiting car.json"
 
 const Hero = () => {
-  const stats = [
-    { icon: Users, value: "2M+", label: "Happy Customers" },
-    { icon: MapPin, value: "50+", label: "Cities Served" },
-    { icon: Star, value: "4.9", label: "Average Rating" },
-  ]
-
   return (
     <section className="relative bg-gradient-to-br from-bg-main via-white to-card-bg min-h-screen flex items-center overflow-hidden">
       {/* Background decorations */}
@@ -47,19 +41,6 @@ const Hero = () => {
                   Become a Driver
                 </Button>
               </Link>
-            </div>
-
-            {/* Trust indicators */}
-            <div className="grid grid-cols-3 gap-6 pt-8 border-t border-border-color">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="flex justify-center mb-2">
-                    <stat.icon className="w-6 h-6 text-primary" />
-                  </div>
-                  <div className="text-2xl font-bold text-text-dark">{stat.value}</div>
-                  <div className="text-sm text-text-secondary">{stat.label}</div>
-                </div>
-              ))}
             </div>
           </div>
 

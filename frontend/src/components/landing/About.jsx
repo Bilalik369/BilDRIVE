@@ -99,20 +99,6 @@ const About = () => {
           </div>
         </div>
 
-        {/* Stats section */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-          {stats.map((stat, index) => (
-            <Card key={index} className="text-center">
-              <div className="w-12 h-12 bg-primary bg-opacity-10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <stat.icon className="w-6 h-6 text-primary" />
-              </div>
-              <div className="text-3xl font-bold text-text-dark mb-2">{stat.value}</div>
-              <div className="text-lg font-semibold text-text-primary mb-2">{stat.label}</div>
-              <div className="text-sm text-text-secondary">{stat.description}</div>
-            </Card>
-          ))}
-        </div>
-
         {/* Values section */}
         <div className="text-center mb-12">
           <h3 className="text-2xl lg:text-3xl font-bold text-text-dark mb-6">Our Core Values</h3>
