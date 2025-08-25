@@ -2,11 +2,6 @@ import dotenv from "dotenv"
 dotenv.config()
 import nodemailer from "nodemailer";
 
-// console.log("EMAIL_HOST:", process.env.EMAIL_HOST);
-// console.log("EMAIL_PORT:", process.env.EMAIL_PORT);
-// console.log("EMAIL_SECURE:", process.env.EMAIL_SECURE);
-// console.log("EMAIL_USER:", process.env.EMAIL_USER);
-
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
   port: Number(process.env.EMAIL_PORT), 
@@ -35,7 +30,7 @@ export const sendVerificationEmail = async (email, token) => {
 
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <p style="margin: 8px 0; text-align: center;">
-            <strong style="color: #9929EA;">Cliquez sur le bouton ci-dessous pour vérifier votre email</strong>
+            <strong style="color: #FF6500;">Cliquez sur le bouton ci-dessous pour vérifier votre email</strong>
           </p>
         </div>
 
@@ -64,7 +59,7 @@ export const sendVerificationEmail = async (email, token) => {
       subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background-color: #FF6500; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
           <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
@@ -89,7 +84,6 @@ export const sendVerificationEmail = async (email, token) => {
 
 export const sendPasswordResetEmail = async (email, token) => {
   try {
-    
     const frontendBase = process.env.FRONTEND_URL || "http://localhost:3000"
     const resetUrl = `${frontendBase}/auth/reset-password/${token}`
 
@@ -103,7 +97,7 @@ export const sendPasswordResetEmail = async (email, token) => {
 
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <p style="margin: 8px 0; text-align: center;">
-            <strong style="color: #9929EA;">Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe</strong>
+            <strong style="color: #FF6500;">Cliquez sur le bouton ci-dessous pour réinitialiser votre mot de passe</strong>
           </p>
         </div>
 
@@ -132,7 +126,7 @@ export const sendPasswordResetEmail = async (email, token) => {
       subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background-color: #FF6500; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
           <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
@@ -163,7 +157,7 @@ export const sendNotificationEmail = async (email, subject, htmlMessage) => {
       subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background-color: #FF6500; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
           <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
@@ -195,10 +189,10 @@ export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresse
         <p style="color: #007bff; font-weight: bold; margin-bottom: 20px;">Une nouvelle course a été demandée !</p>
 
         <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 8px 0;"><strong style="color: #9929EA;">De :</strong> ${adresseDepart}</p>
-          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Vers :</strong> ${adresseArrivee}</p>
-          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Prix estimé :</strong> ${prix} DH</p>
-          <p style="margin: 8px 0;"><strong style="color: #9929EA;">Distance :</strong> ${distance} km</p>
+          <p style="margin: 8px 0;"><strong style="color: #FF6500;">De :</strong> ${adresseDepart}</p>
+          <p style="margin: 8px 0;"><strong style="color: #FF6500;">Vers :</strong> ${adresseArrivee}</p>
+          <p style="margin: 8px 0;"><strong style="color: #FF6500;">Prix estimé :</strong> ${prix} DH</p>
+          <p style="margin: 8px 0;"><strong style="color: #FF6500;">Distance :</strong> ${distance} km</p>
         </div>
 
         <p>Connectez-vous à votre application pour accepter cette course.</p>
@@ -211,7 +205,7 @@ export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresse
       subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background-color: #FF6500; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
           <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
@@ -234,7 +228,6 @@ export const sendRideRequestEmailToDriver = async (email, adresseDepart, adresse
   }
 };
 
-
 export const sendRideAcceptedEmailToPassenger = async (email, chauffeur, arriveeEstimee, distance, prix) => {
   try {
     const subject = "Course acceptée !";
@@ -244,24 +237,23 @@ export const sendRideAcceptedEmailToPassenger = async (email, chauffeur, arrivee
       <p style="color: #28a745; font-weight: bold; margin-bottom: 20px;"> Votre course est confirmée !</p>
   
       <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Chauffeur :</strong> ${chauffeur}</p>
-        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Arrivée estimée :</strong> ${arriveeEstimee}</p>
-        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Distance :</strong> ${distance}</p>
-        <p style="margin: 8px 0;"><strong style="color: #9929EA;">Prix total :</strong> ${prix} DH</p>
+        <p style="margin: 8px 0;"><strong style="color: #FF6500;">Chauffeur :</strong> ${chauffeur}</p>
+        <p style="margin: 8px 0;"><strong style="color: #FF6500;">Arrivée estimée :</strong> ${arriveeEstimee}</p>
+        <p style="margin: 8px 0;"><strong style="color: #FF6500;">Distance :</strong> ${distance}</p>
+        <p style="margin: 8px 0;"><strong style="color: #FF6500;">Prix total :</strong> ${prix} DH</p>
       </div>
   
       <p>Votre chauffeur arrive bientôt. Préparez-vous à partir en toute tranquillité !</p>
     </div>
   `;
   
-
     const mailOptions = {
       from: `"Bildrive" <${process.env.EMAIL_FROM}>`,
       to: email,
       subject: subject,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <div style="background-color: #9929EA; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+          <div style="background-color: #FF6500; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 24px;">Bildrive</h1>
           </div>
           <div style="background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px;">
