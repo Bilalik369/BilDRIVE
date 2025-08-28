@@ -8,17 +8,24 @@ import { toast } from "react-hot-toast"
 import Button from "../../components/ui/Button"
 import Input from "../../components/ui/Input"
 import Card from "../../components/ui/Card"
+import InteractiveMap from "../../components/Map/InteractiveMap"
+import LocationSearch from "../../components/Map/LocationSearch"
+import RouteInfo from "../../components/Map/RouteInfo"
 import { useRide } from "../../hooks/useRide"
 import { useGeolocation } from "../../hooks/useGeolocation"
 import { VEHICLE_TYPES, PAYMENT_METHODS } from "../../utils/constants"
 import { formatCurrency } from "../../utils/helpers"
+import { calculatePrice } from "../../utils/mapsClient"
 
 const RideRequestPage = () => {
   const navigate = useNavigate()
   const [currentStep, setCurrentStep] = useState(1)
+  const [pickupLocation, setPickupLocation] = useState(null)
+  const [destinationLocation, setDestinationLocation] = useState(null)
+  const [routeInfo, setRouteInfo] = useState(null)
   const [estimatedPrice, setEstimatedPrice] = useState(null)
-  const [estimatedTime, setEstimatedTime] = useState(null)
   const [availableDrivers, setAvailableDrivers] = useState([])
+  const [mapLoading, setMapLoading] = useState(false)
   const { requestRide, loading } = useRide()
   const { location, getCurrentLocation } = useGeolocation()
 
@@ -39,74 +46,94 @@ const RideRequestPage = () => {
 
   const watchedValues = watch()
 
-  useEffect(() => {
-    if (location) {
-      setValue("pickupLat", location.latitude)
-      setValue("pickupLng", location.longitude)
+  // Handle location selection from map or search
+  const handleLocationSelect = (type, location) => {
+    if (type === 'pickup') {
+      setPickupLocation(location)
+      setValue('pickup', location?.address || '')
+      setValue('pickupLat', location?.coordinates?.[1] || '')
+      setValue('pickupLng', location?.coordinates?.[0] || '')
+    } else if (type === 'destination') {
+      setDestinationLocation(location)
+      setValue('destination', location?.address || '')
+      setValue('destinationLat', location?.coordinates?.[1] || '')
+      setValue('destinationLng', location?.coordinates?.[0] || '')
     }
-  }, [location, setValue])
+  }
 
-  // Simulation du calcul de prix
+  // Handle route calculation
+  const handleRouteCalculated = (routeData) => {
+    setRouteInfo(routeData)
+    
+    // Calculate price based on distance and duration
+    if (routeData.distance && routeData.duration) {
+      const priceData = calculatePrice(
+        routeData.distance, 
+        routeData.duration, 
+        watchedValues.vehicleType
+      )
+      setEstimatedPrice(priceData)
+    }
+  }
+
+  // Set current location as pickup
   useEffect(() => {
-    if (watchedValues.pickup && watchedValues.destination) {
-      const basePrice = 5
-      const distancePrice = Math.random() * 20 + 5
-      const typeMultiplier = {
-        economy: 1,
-        standard: 1.2,
-        premium: 1.5,
-        suv: 1.8,
+    if (location && !pickupLocation) {
+      const currentLocationData = {
+        coordinates: [location.longitude, location.latitude],
+        address: "Current Location",
+        type: 'pickup'
       }
-      const total = (basePrice + distancePrice) * typeMultiplier[watchedValues.vehicleType]
-      setEstimatedPrice(total)
-      setEstimatedTime(Math.floor(Math.random() * 20) + 5)
+      setPickupLocation(currentLocationData)
+      setValue('pickup', 'Current Location')
+      setValue('pickupLat', location.latitude)
+      setValue('pickupLng', location.longitude)
+    }
+  }, [location, pickupLocation, setValue])
 
-      // Simulation des chauffeurs disponibles
+  // Update price when vehicle type changes
+  useEffect(() => {
+    if (routeInfo?.distance && routeInfo?.duration) {
+      const priceData = calculatePrice(
+        routeInfo.distance, 
+        routeInfo.duration, 
+        watchedValues.vehicleType
+      )
+      setEstimatedPrice(priceData)
+    }
+  }, [watchedValues.vehicleType, routeInfo])
+
+  // Simulate available drivers when route is calculated
+  useEffect(() => {
+    if (routeInfo) {
       setAvailableDrivers([
         { id: 1, name: "Ahmed Ben Ali", rating: 4.8, distance: "2 min", vehicle: "Toyota Corolla" },
         { id: 2, name: "Fatima Zahra", rating: 4.9, distance: "5 min", vehicle: "Hyundai Accent" },
         { id: 3, name: "Mohamed Taha", rating: 4.7, distance: "8 min", vehicle: "Renault Logan" },
       ])
     }
-  }, [watchedValues.pickup, watchedValues.destination, watchedValues.vehicleType])
+  }, [routeInfo])
 
   const onSubmit = async (data) => {
     try {
-      const geocodeIfMissing = async (address, lat, lng) => {
-        if ((lat === undefined || lat === null || lat === "") || (lng === undefined || lng === null || lng === "")) {
-          if (!address) return null
-          const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`
-          const res = await fetch(url, { headers: { "Accept": "application/json" } })
-          const json = await res.json()
-          if (Array.isArray(json) && json.length > 0) {
-            return { lat: parseFloat(json[0].lat), lng: parseFloat(json[0].lon) }
-          }
-          return null
-        }
-        return { lat: parseFloat(lat), lng: parseFloat(lng) }
-      }
-
-      const pickupCoords = await geocodeIfMissing(data.pickup, data.pickupLat, data.pickupLng)
-      const destinationCoords = await geocodeIfMissing(data.destination, data.destinationLat, data.destinationLng)
-
-      if (!pickupCoords || !destinationCoords) {
-        toast.error("Adresse invalide. Veuillez vérifier le départ et la destination.")
+      if (!pickupLocation?.coordinates || !destinationLocation?.coordinates) {
+        toast.error("Please select both pickup and destination locations")
         return
       }
 
       const rideData = {
         pickup: {
-          address: data.pickup,
+          address: pickupLocation.address,
           location: {
             type: "Point",
-            coordinates: [pickupCoords.lng, pickupCoords.lat],
+            coordinates: pickupLocation.coordinates,
           },
         },
         destination: {
-          address: data.destination,
+          address: destinationLocation.address,
           location: {
             type: "Point",
-            coordinates: [destinationCoords.lng, destinationCoords.lat],
+            coordinates: destinationLocation.coordinates,
           },
         },
         vehicleType: data.vehicleType,
@@ -114,6 +141,9 @@ const RideRequestPage = () => {
         paymentMethod: data.paymentMethod,
         scheduledTime: data.scheduledTime || null,
         notes: data.notes || "",
+        estimatedPrice: estimatedPrice?.total || null,
+        estimatedDuration: routeInfo?.duration || null,
+        estimatedDistance: routeInfo?.distance || null,
       }
 
       const result = await requestRide(rideData)
@@ -126,6 +156,11 @@ const RideRequestPage = () => {
   }
 
   const nextStep = async () => {
+    if (currentStep === 1 && (!pickupLocation || !destinationLocation)) {
+      toast.error("Please select both pickup and destination locations")
+      return
+    }
+    
     const isValid = await trigger()
     if (isValid && currentStep < 4) {
       setCurrentStep(currentStep + 1)
@@ -177,8 +212,8 @@ const RideRequestPage = () => {
   ]
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      {/* Indicateur de progression */}
+    <div className="max-w-6xl mx-auto p-6">
+      {/* Progress indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           {steps.map((step, index) => {
@@ -208,64 +243,99 @@ const RideRequestPage = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Étape 1: Destination */}
+        {/* Step 1: Destination with Interactive Map */}
         {currentStep === 1 && (
-          <Card className="p-8">
-            <div className="space-y-6">
-              <div className="relative">
-                <Input
-                  label="Point de départ"
-                  placeholder="Entrez l'adresse de départ"
-                  icon={<MapPin className="w-5 h-5 text-green-500" />}
-                  error={errors.pickup?.message}
-                  {...register("pickup", { required: "Le point de départ est requis" })}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-8"
-                  onClick={getCurrentLocation}
-                >
-                  Ma position
-                </Button>
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Left side - Search inputs */}
+            <Card className="p-6">
+              <div className="space-y-6">
+                <div className="relative">
+                  <label className="block text-sm font-medium mb-2">Point de départ</label>
+                  <LocationSearch
+                    placeholder="Entrez l'adresse de départ"
+                    value={pickupLocation?.address || ''}
+                    onLocationSelect={(location) => handleLocationSelect('pickup', location)}
+                    icon={<MapPin className="w-5 h-5 text-green-500" />}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2"
+                    onClick={getCurrentLocation}
+                  >
+                    Utiliser ma position actuelle
+                  </Button>
+                </div>
 
-              <Input
-                label="Destination"
-                placeholder="Où souhaitez-vous aller ?"
-                icon={<MapPin className="w-5 h-5 text-red-500" />}
-                error={errors.destination?.message}
-                {...register("destination", { required: "La destination est requise" })}
-              />
+                <div>
+                  <label className="block text-sm font-medium mb-2">Destination</label>
+                  <LocationSearch
+                    placeholder="Où souhaitez-vous aller ?"
+                    value={destinationLocation?.address || ''}
+                    onLocationSelect={(location) => handleLocationSelect('destination', location)}
+                    icon={<MapPin className="w-5 h-5 text-red-500" />}
+                  />
+                </div>
 
-              <input type="hidden" {...register("pickupLat")} />
-              <input type="hidden" {...register("pickupLng")} />
-              <input type="hidden" {...register("destinationLat")} />
-              <input type="hidden" {...register("destinationLng")} />
+                <input type="hidden" {...register("pickup")} />
+                <input type="hidden" {...register("destination")} />
+                <input type="hidden" {...register("pickupLat")} />
+                <input type="hidden" {...register("pickupLng")} />
+                <input type="hidden" {...register("destinationLat")} />
+                <input type="hidden" {...register("destinationLng")} />
 
-              {/* Suggestions d'adresses récentes */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium mb-3">Adresses récentes</h4>
-                <div className="space-y-2">
-                  {["Aéroport Mohammed V", "Gare Casa-Port", "Twin Center"].map((address) => (
-                    <button
-                      key={address}
-                      type="button"
-                      className="w-full text-left p-2 hover:bg-white rounded transition-colors"
-                      onClick={() => setValue("destination", address)}
-                    >
-                      <MapPin className="w-4 h-4 inline mr-2 text-gray-400" />
-                      {address}
-                    </button>
-                  ))}
+                {/* Route information */}
+                {routeInfo && (
+                  <RouteInfo
+                    distance={routeInfo.distanceText}
+                    duration={routeInfo.durationText}
+                    price={estimatedPrice?.formattedTotal}
+                    loading={mapLoading}
+                  />
+                )}
+
+                {/* Recent addresses */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium mb-3">Adresses récentes</h4>
+                  <div className="space-y-2">
+                    {["Aéroport Mohammed V", "Gare Casa-Port", "Twin Center"].map((address) => (
+                      <button
+                        key={address}
+                        type="button"
+                        className="w-full text-left p-2 hover:bg-white rounded transition-colors"
+                        onClick={() => {
+                          const location = { address, coordinates: null }
+                          handleLocationSelect('destination', location)
+                        }}
+                      >
+                        <MapPin className="w-4 h-4 inline mr-2 text-gray-400" />
+                        {address}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+
+            {/* Right side - Interactive Map */}
+            <Card className="p-6">
+              <h3 className="text-lg font-semibold mb-4">Sélectionnez sur la carte</h3>
+              <InteractiveMap
+                mode="passenger"
+                onLocationSelect={handleLocationSelect}
+                onRouteCalculated={handleRouteCalculated}
+                center={{ lat: 33.5731, lng: -7.5898 }}
+                zoom={12}
+                height="500px"
+                pickupLocation={pickupLocation}
+                destinationLocation={destinationLocation}
+              />
+            </Card>
+          </div>
         )}
 
-        {/* Étape 2: Type de véhicule */}
+        {/* Step 2: Vehicle type */}
         {currentStep === 2 && (
           <Card className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -292,14 +362,14 @@ const RideRequestPage = () => {
                   <div className="text-sm text-gray-600 text-center mb-3">{option.description}</div>
                   {estimatedPrice && (
                     <div className="text-lg font-bold text-primary">
-                      {formatCurrency(estimatedPrice * option.multiplier)}
+                      {calculatePrice(routeInfo?.distance || 0, routeInfo?.duration || 0, option.value).formattedTotal}
                     </div>
                   )}
                 </label>
               ))}
             </div>
 
-            {/* Chauffeurs disponibles */}
+            {/* Available drivers */}
             {availableDrivers.length > 0 && (
               <div className="mt-8">
                 <h4 className="font-semibold mb-4">Chauffeurs disponibles</h4>
@@ -330,7 +400,7 @@ const RideRequestPage = () => {
           </Card>
         )}
 
-        {/* Étape 3: Détails */}
+        {/* Step 3: Details */}
         {currentStep === 3 && (
           <Card className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -382,13 +452,13 @@ const RideRequestPage = () => {
           </Card>
         )}
 
-        {/* Étape 4: Confirmation */}
+        {/* Step 4: Confirmation */}
         {currentStep === 4 && (
           <Card className="p-8">
             <h3 className="text-xl font-semibold mb-6">Récapitulatif de votre course</h3>
 
             <div className="space-y-6">
-              {/* Itinéraire */}
+              {/* Route */}
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-start gap-4">
                   <div className="flex flex-col items-center">
@@ -399,17 +469,17 @@ const RideRequestPage = () => {
                   <div className="flex-1">
                     <div className="mb-4">
                       <div className="font-medium">Départ</div>
-                      <div className="text-gray-600">{watchedValues.pickup}</div>
+                      <div className="text-gray-600">{pickupLocation?.address || 'Not selected'}</div>
                     </div>
                     <div>
                       <div className="font-medium">Destination</div>
-                      <div className="text-gray-600">{watchedValues.destination}</div>
+                      <div className="text-gray-600">{destinationLocation?.address || 'Not selected'}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Détails */}
+              {/* Details grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <Car className="w-6 h-6 mx-auto mb-2 text-gray-600" />
@@ -423,7 +493,7 @@ const RideRequestPage = () => {
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <Clock className="w-6 h-6 mx-auto mb-2 text-gray-600" />
-                  <div className="font-medium">{estimatedTime} min</div>
+                  <div className="font-medium">{routeInfo?.durationText || 'N/A'}</div>
                   <div className="text-sm text-gray-600">Durée</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -433,15 +503,17 @@ const RideRequestPage = () => {
                 </div>
               </div>
 
-              {/* Prix */}
+              {/* Final price */}
               {estimatedPrice && (
                 <div className="bg-primary bg-opacity-10 border border-primary rounded-lg p-6">
                   <div className="flex justify-between items-center">
                     <div>
                       <div className="text-lg font-semibold">Prix estimé</div>
-                      <div className="text-sm text-gray-600">Temps d'arrivée: {estimatedTime} minutes</div>
+                      <div className="text-sm text-gray-600">
+                        Distance: {routeInfo?.distanceText} • Durée: {routeInfo?.durationText}
+                      </div>
                     </div>
-                    <div className="text-3xl font-bold text-primary">{formatCurrency(estimatedPrice)}</div>
+                    <div className="text-3xl font-bold text-primary">{estimatedPrice.formattedTotal}</div>
                   </div>
                 </div>
               )}
@@ -449,7 +521,7 @@ const RideRequestPage = () => {
           </Card>
         )}
 
-        {/* Boutons de navigation */}
+        {/* Navigation buttons */}
         <div className="flex justify-between mt-8">
           <Button
             type="button"

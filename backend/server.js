@@ -5,6 +5,7 @@ import cors from 'cors'
 import { createServer } from "http"
 import authRoutes from "./routes/auth.routes.js"
 import rideRoutes from "./routes/ride.routes.js"
+import mapsRoutes from "./routes/maps.routes.js"
 import { initializeSocket } from "./utils/realtime.utils.js"
 dotenv.config();
 
@@ -24,7 +25,8 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 
 app.use("/api/auth", authRoutes);
-app.use("/api/rides", rideRoutes)
+app.use("/api/rides", rideRoutes);
+app.use("/api/maps", mapsRoutes);
 
 const startServer = async () => {
   try {
