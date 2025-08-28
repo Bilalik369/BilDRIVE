@@ -1,6 +1,6 @@
 import React from "react";
 import { Provider } from "react-redux";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { store } from "./redux/store";
 import Register from "./pages/auth/Register";
@@ -24,23 +24,45 @@ import Contact from "../src/components/landing/Contact"
 
 
 
+// Ride feature pages
+import RideRequestPage from "./pages/ride/RideRequestPage"
+import RideDetailsPage from "./pages/ride/RideDetailsPage"
+import RideHistoryPage from "./pages/ride/RideHistoryPage"
+import RideTrackingPage from "./pages/ride/RideTrackingPage"
+import RideRatingPage from "./pages/ride/RideRatingPage"
+import RideScheduledPage from "./pages/ride/RideScheduledPage"
+import RideDashboard from "./pages/ride/RideDashboard"
+import DriverDashboard from "./pages/driver/DriverDashboard"
+import DriverAvailabilityPage from "./pages/driver/DriverAvailabilityPage"
+import DriverEarningsPage from "./pages/driver/DriverEarningsPage"
+import DriverProfilePage from "./pages/driver/DriverProfilePage"
+import DriverRideDetailsPage from "./pages/driver/DriverRideDetailsPage"
+import DriverRideRequestsPage from "./pages/driver/DriverRideRequestsPage"
+
 const Dashboard = () => (
   <div className="min-h-screen bg-bg-main p-8">
     <div className="max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold text-text-dark mb-6">Passenger Dashboard</h1>
-      <p className="text-text-secondary">Welcome to your passenger dashboard!</p>
+      <p className="text-text-secondary mb-6">Welcome to your passenger dashboard!</p>
+      <div className="flex gap-3">
+        <Link
+          to="/rides/request"
+          className="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
+        >
+          Request a Ride
+        </Link>
+        <Link
+          to="/rides/history"
+          className="px-4 py-2 rounded-lg border border-border-color text-text-dark hover:bg-gray-50"
+        >
+          Ride History
+        </Link>
+      </div>
     </div>
   </div>
 );
 
-const DriverDashboard = () => (
-  <div className="min-h-screen bg-bg-main p-8">
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-text-dark mb-6">Driver Dashboard</h1>
-      <p className="text-text-secondary">Welcome to your driver dashboard!</p>
-    </div>
-  </div>
-);
+
 
 function App() {
 
@@ -99,7 +121,7 @@ function App() {
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <RideDashboard />
                 </ProtectedRoute>
               } 
             />
@@ -111,8 +133,124 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/driver/availability" 
+              element={
+                <ProtectedRoute>
+                  <DriverAvailabilityPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/driver/earnings" 
+              element={
+                <ProtectedRoute>
+                  <DriverEarningsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/driver/profile" 
+              element={
+                <ProtectedRoute>
+                  <DriverProfilePage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route
+              path="/driver/rides/:rideId"
+              element={
+                <ProtectedRoute>
+                  <DriverRideDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/ride-details/:rideId"
+              element={
+                <ProtectedRoute>
+                  <DriverRideDetailsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/requests"
+              element={
+                <ProtectedRoute>
+                  <DriverRideRequestsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/driver/ride-requests"
+              element={
+                <ProtectedRoute>
+                  <DriverRideRequestsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/driver" element={<Navigate to="/driver/dashboard" replace />} />
+            {/* Passenger ride routes */}
+            <Route 
+              path="/ride/request" 
+              element={
+                <ProtectedRoute>
+                  <RideRequestPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ride/history" 
+              element={
+                <ProtectedRoute>
+                  <RideHistoryPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ride/scheduled" 
+              element={
+                <ProtectedRoute>
+                  <RideScheduledPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ride/details/:rideId" 
+              element={
+                <ProtectedRoute>
+                  <RideDetailsPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ride/tracking/:rideId" 
+              element={
+                <ProtectedRoute>
+                  <RideTrackingPage />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/ride/rating/:rideId" 
+              element={
+                <ProtectedRoute>
+                  <RideRatingPage />
+                </ProtectedRoute>
+              } 
+            />
             {/* 404 */}
-            <Route path="*" element={<div>Home or 404</div>} />
+            <Route path="*" element={
+              <div className="min-h-screen bg-bg-main flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-4xl font-bold text-text-dark mb-4">404</h1>
+                  <p className="text-text-secondary mb-6">Page non trouvée</p>
+                  <Link to="/" className="px-6 py-3 bg-primary text-white rounded-lg hover:opacity-90">
+                    Retour à l'accueil
+                  </Link>
+                </div>
+              </div>
+            } />
           </Routes>
           <Footer />
         </Router>
