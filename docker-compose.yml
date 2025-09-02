@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   mongo:
     image: mongo:6.0
@@ -15,6 +17,8 @@ services:
     restart: always
     ports:
       - "5012:5000"
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/bildrave
     env_file:
       - ./backend/.env
     depends_on:
