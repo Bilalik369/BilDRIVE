@@ -66,6 +66,8 @@ jobs:
       - name: Build & Push Frontend
         run: |
           cd frontend
+         
+          echo "REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" > .env
           docker build -t ${{ secrets.DOCKER_USERNAME }}/bildrive-frontend:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/bildrive-frontend:latest
           
@@ -80,4 +82,3 @@ jobs:
         with:
           app-name: frontend-bildrive
           images: ${{ secrets.DOCKER_USERNAME }}/bildrive-frontend:latest
-
