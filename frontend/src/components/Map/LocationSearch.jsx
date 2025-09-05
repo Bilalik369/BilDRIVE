@@ -110,8 +110,57 @@ const LocationSearch = ({
     }, 300);
   };
 
+  // Cities and popular locations in Morocco for better search
+  const moroccanCities = [
+    { name: 'Casablanca', coordinates: [-7.5898, 33.5731] },
+    { name: 'Rabat', coordinates: [-6.8498, 34.0209] },
+    { name: 'Marrakech', coordinates: [-7.9811, 31.6295] },
+    { name: 'Fès', coordinates: [-5.0003, 34.0181] },
+    { name: 'Tanger', coordinates: [-5.8540, 35.7595] },
+    { name: 'Agadir', coordinates: [-9.5981, 30.4278] },
+    { name: 'Meknes', coordinates: [-5.5471, 33.8935] },
+    { name: 'Oujda', coordinates: [-1.9086, 34.6814] },
+    { name: 'Kenitra', coordinates: [-6.5802, 34.2610] },
+    { name: 'Tetouan', coordinates: [-5.3684, 35.5889] },
+    { name: 'Safi', coordinates: [-9.2372, 32.2994] },
+    { name: 'Mohammedia', coordinates: [-7.3826, 33.6866] },
+    { name: 'Khouribga', coordinates: [-6.9063, 32.8811] },
+    { name: 'El Jadida', coordinates: [-8.5069, 33.2316] },
+    { name: 'Beni Mellal', coordinates: [-6.3498, 32.3372] },
+    { name: 'Nador', coordinates: [-2.9287, 35.1681] },
+    { name: 'Taza', coordinates: [-4.0100, 34.2133] },
+    { name: 'Settat', coordinates: [-7.6160, 33.0018] },
+    { name: 'Larache', coordinates: [-6.1537, 35.1932] },
+    { name: 'Ksar El Kebir', coordinates: [-5.9949, 35.0019] },
+    { name: 'Khemisset', coordinates: [-6.0697, 33.8244] },
+    { name: 'Guelmim', coordinates: [-10.0574, 28.9870] },
+    { name: 'Berrechid', coordinates: [-7.5844, 33.2655] },
+    { name: 'Ouarzazate', coordinates: [-6.9370, 30.9189] },
+    { name: 'Tiznit', coordinates: [-9.7316, 29.7006] },
+    { name: 'Errachidia', coordinates: [-4.4167, 31.9314] }
+  ];
+
   const searchPlaces = async (query) => {
     try {
+      const normalizedQuery = query.toLowerCase().trim();
+      let localSuggestions = [];
+
+      // First, check for local Moroccan cities
+      const matchingCities = moroccanCities.filter(city =>
+        city.name.toLowerCase().includes(normalizedQuery) ||
+        normalizedQuery.includes(city.name.toLowerCase())
+      );
+
+      localSuggestions = matchingCities.map(city => ({
+        placeId: `local_${city.name.toLowerCase().replace(/\s+/g, '_')}`,
+        address: `${city.name}, Maroc`,
+        mainText: city.name,
+        secondaryText: 'Maroc',
+        coordinates: city.coordinates,
+        types: ['locality', 'political'],
+        isLocalSuggestion: true
+      }));
+
       if (autocompleteService.current &&
           window.google &&
           window.google.maps &&
@@ -119,34 +168,51 @@ const LocationSearch = ({
         // Use Google Places Autocomplete for better results
         autocompleteService.current.getPlacePredictions(
           {
-            input: query,
-            componentRestrictions: { country: 'ma' }, // Restrict to Morocco
-            types: ['establishment', 'geocode']
+            input: query + ', Maroc', // Add Morocco to improve results
+            componentRestrictions: { country: 'ma' },
+            types: ['(cities)', 'establishment', 'geocode', 'address'] // More inclusive types
           },
           (predictions, status) => {
             setIsLoading(false);
 
+            let googleSuggestions = [];
             if (status === window.google.maps.places.PlacesServiceStatus.OK && predictions) {
-              const formattedSuggestions = predictions.map(prediction => ({
+              googleSuggestions = predictions.map(prediction => ({
                 placeId: prediction.place_id,
                 address: prediction.description,
                 mainText: prediction.structured_formatting.main_text,
                 secondaryText: prediction.structured_formatting.secondary_text,
-                types: prediction.types
+                types: prediction.types,
+                isLocalSuggestion: false
               }));
+            }
 
-              setSuggestions(formattedSuggestions);
+            // Combine local suggestions with Google suggestions, prioritizing local
+            const combinedSuggestions = [...localSuggestions, ...googleSuggestions]
+              .filter((suggestion, index, self) =>
+                index === self.findIndex(s => s.mainText === suggestion.mainText)
+              )
+              .slice(0, 8); // Limit to 8 suggestions
+
+            if (combinedSuggestions.length > 0) {
+              setSuggestions(combinedSuggestions);
               setShowSuggestions(true);
             } else {
-              // Fallback to geocoding if autocomplete fails
+              // Fallback to geocoding if no suggestions
               fallbackGeocode(query);
             }
           }
         );
       } else {
-        // Fallback to geocoding if Places API is not available
-        console.warn('Google Places API not available, using geocoding fallback');
-        fallbackGeocode(query);
+        // If Google Places is not available, use local suggestions + geocoding
+        if (localSuggestions.length > 0) {
+          setSuggestions(localSuggestions);
+          setShowSuggestions(true);
+          setIsLoading(false);
+        } else {
+          console.warn('Google Places API not available, using geocoding fallback');
+          fallbackGeocode(query);
+        }
       }
     } catch (error) {
       console.error('Error searching places:', error);
@@ -156,16 +222,22 @@ const LocationSearch = ({
 
   const fallbackGeocode = async (query) => {
     try {
-      const result = await geocodeAddress(query);
+      // Try with Morocco suffix if not present
+      const searchQuery = query.toLowerCase().includes('maroc') || query.toLowerCase().includes('morocco')
+        ? query
+        : `${query}, Maroc`;
+
+      const result = await geocodeAddress(searchQuery);
       const suggestion = {
         placeId: result.placeId,
         address: result.formattedAddress,
         mainText: result.formattedAddress.split(',')[0],
         secondaryText: result.formattedAddress.split(',').slice(1).join(','),
         coordinates: result.coordinates,
-        types: result.types
+        types: result.types,
+        isLocalSuggestion: false
       };
-      
+
       setSuggestions([suggestion]);
       setShowSuggestions(true);
       setIsLoading(false);
@@ -175,7 +247,7 @@ const LocationSearch = ({
       setShowSuggestions(false);
       setIsLoading(false);
       if (query.trim().length > 2) {
-        toast.error('No results found for this address');
+        toast.error('Aucun résultat trouvé pour cette adresse');
       }
     }
   };
@@ -196,11 +268,20 @@ const LocationSearch = ({
           placeId: suggestion.placeId,
           types: suggestion.types
         };
+      } else if (suggestion.isLocalSuggestion) {
+        // Use coordinates from local suggestion
+        locationData = {
+          coordinates: suggestion.coordinates,
+          address: suggestion.address,
+          placeId: suggestion.placeId,
+          types: suggestion.types,
+          name: suggestion.mainText
+        };
       } else if (placesService.current &&
                  window.google &&
                  window.google.maps &&
                  window.google.maps.places) {
-        // Get place details for coordinates
+        // Get place details for coordinates from Google Places
         await new Promise((resolve, reject) => {
           placesService.current.getDetails(
             {

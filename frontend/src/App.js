@@ -39,28 +39,6 @@ import DriverProfilePage from "./pages/driver/DriverProfilePage"
 import DriverRideDetailsPage from "./pages/driver/DriverRideDetailsPage"
 import DriverRideRequestsPage from "./pages/driver/DriverRideRequestsPage"
 
-const Dashboard = () => (
-  <div className="min-h-screen bg-bg-main p-8">
-    <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold text-text-dark mb-6">Passenger Dashboard</h1>
-      <p className="text-text-secondary mb-6">Welcome to your passenger dashboard!</p>
-      <div className="flex gap-3">
-        <Link
-          to="/rides/request"
-          className="px-4 py-2 rounded-lg bg-primary text-white hover:opacity-90"
-        >
-          Request a Ride
-        </Link>
-        <Link
-          to="/rides/history"
-          className="px-4 py-2 rounded-lg border border-border-color text-text-dark hover:bg-gray-50"
-        >
-          Ride History
-        </Link>
-      </div>
-    </div>
-  </div>
-);
 
 
 

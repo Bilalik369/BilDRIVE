@@ -258,7 +258,7 @@ export const login = async(req , res , next)=>{
       return next(createError(401 , "Invalid email or password"))
     }
 
-    // Check if user is verified
+
     if (!user.isVerified) {
       return next(createError(403, "Please verify your email before logging in. Check your inbox for a verification link."))
     }
@@ -306,10 +306,10 @@ export const verifyEmail = async (req, res, next) => {
 
     // If it's a GET request (from email link), redirect to frontend
     if (req.method === 'GET') {
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+      const frontendUrl = process.env.FRONTEND_URL || "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net"
       res.redirect(`${frontendUrl}/auth/login?verified=true`)
     } else {
-      // If it's a POST request (from frontend API call), return JSON
+  
       res.status(200).json({
         success: true,
         message: "Email verified successfully",

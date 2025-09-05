@@ -11,6 +11,7 @@ import Card from "../../components/ui/Card"
 import InteractiveMap from "../../components/Map/InteractiveMap"
 import LocationSearch from "../../components/Map/LocationSearch"
 import RouteInfo from "../../components/Map/RouteInfo"
+import DriverSelection from "../../components/ride/DriverSelection"
 import { useRide } from "../../hooks/useRide"
 import { useGeolocation } from "../../hooks/useGeolocation"
 import { VEHICLE_TYPES, PAYMENT_METHODS } from "../../utils/constants"
@@ -25,7 +26,9 @@ const RideRequestPage = () => {
   const [routeInfo, setRouteInfo] = useState(null)
   const [estimatedPrice, setEstimatedPrice] = useState(null)
   const [availableDrivers, setAvailableDrivers] = useState([])
+  const [selectedDriver, setSelectedDriver] = useState(null)
   const [mapLoading, setMapLoading] = useState(false)
+  const [showDriversOnMap, setShowDriversOnMap] = useState(true)
   const { requestRide, loading } = useRide()
   const { location, getCurrentLocation } = useGeolocation()
 
@@ -103,16 +106,74 @@ const RideRequestPage = () => {
     }
   }, [watchedValues.vehicleType, routeInfo])
 
-  // Simulate available drivers when route is calculated
+  // Load available drivers when route is calculated
   useEffect(() => {
-    if (routeInfo) {
+    if (routeInfo && pickupLocation?.coordinates) {
+      // Simuler des chauffeurs avec des coordonnées réelles
       setAvailableDrivers([
-        { id: 1, name: "Ahmed Ben Ali", rating: 4.8, distance: "2 min", vehicle: "Toyota Corolla" },
-        { id: 2, name: "Fatima Zahra", rating: 4.9, distance: "5 min", vehicle: "Hyundai Accent" },
-        { id: 3, name: "Mohamed Taha", rating: 4.7, distance: "8 min", vehicle: "Renault Logan" },
+        {
+          id: 1,
+          name: "Ahmed Ben Ali",
+          rating: 4.8,
+          totalRides: 245,
+          vehicle: {
+            make: "Toyota",
+            model: "Corolla",
+            type: "standard",
+            color: "Blanche",
+            plate: "123-A-45"
+          },
+          location: {
+            coordinates: [-7.5850, 33.5750],
+            address: "Avenue Hassan II, Casablanca"
+          },
+          estimatedArrival: 3,
+          priceMultiplier: 1.0,
+          isVerified: true
+        },
+        {
+          id: 2,
+          name: "Fatima Zahra",
+          rating: 4.9,
+          totalRides: 189,
+          vehicle: {
+            make: "Hyundai",
+            model: "Accent",
+            type: "economy",
+            color: "Grise",
+            plate: "567-B-89"
+          },
+          location: {
+            coordinates: [-7.5900, 33.5680],
+            address: "Boulevard Zerktouni, Casablanca"
+          },
+          estimatedArrival: 5,
+          priceMultiplier: 0.9,
+          isVerified: true
+        },
+        {
+          id: 3,
+          name: "Mohamed Taha",
+          rating: 4.7,
+          totalRides: 312,
+          vehicle: {
+            make: "Renault",
+            model: "Logan",
+            type: "standard",
+            color: "Bleue",
+            plate: "234-C-67"
+          },
+          location: {
+            coordinates: [-7.5800, 33.5800],
+            address: "Rue de la Liberté, Casablanca"
+          },
+          estimatedArrival: 7,
+          priceMultiplier: 1.1,
+          isVerified: false
+        }
       ])
     }
-  }, [routeInfo])
+  }, [routeInfo, pickupLocation])
 
   const onSubmit = async (data) => {
     try {
@@ -144,6 +205,7 @@ const RideRequestPage = () => {
         estimatedPrice: estimatedPrice?.total || null,
         estimatedDuration: routeInfo?.duration || null,
         estimatedDistance: routeInfo?.distance || null,
+        selectedDriverId: selectedDriver?.id || null,
       }
 
       const result = await requestRide(rideData)
@@ -157,12 +219,17 @@ const RideRequestPage = () => {
 
   const nextStep = async () => {
     if (currentStep === 1 && (!pickupLocation || !destinationLocation)) {
-      toast.error("Please select both pickup and destination locations")
+      toast.error("Veuillez sélectionner les lieux de départ et d'arrivée")
       return
     }
-    
+
+    if (currentStep === 3 && !selectedDriver) {
+      toast.error("Veuillez sélectionner un chauffeur")
+      return
+    }
+
     const isValid = await trigger()
-    if (isValid && currentStep < 4) {
+    if (isValid && currentStep < 5) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -204,11 +271,28 @@ const RideRequestPage = () => {
     },
   ]
 
+  const handleDriverSelect = (driver) => {
+    setSelectedDriver(driver)
+    setValue('selectedDriverId', driver.id)
+  }
+
+  const handleShowDriverOnMap = (driver) => {
+    // Logique pour centrer la carte sur le chauffeur
+    console.log('Show driver on map:', driver)
+  }
+
+  const handleRideSelect = (type, data) => {
+    if (type === 'driver') {
+      handleDriverSelect(data)
+    }
+  }
+
   const steps = [
     { number: 1, title: "Destination", icon: MapPin },
     { number: 2, title: "Véhicule", icon: Car },
-    { number: 3, title: "Détails", icon: Users },
-    { number: 4, title: "Confirmation", icon: CreditCard },
+    { number: 3, title: "Chauffeur", icon: Users },
+    { number: 4, title: "Détails", icon: Clock },
+    { number: 5, title: "Confirmation", icon: CreditCard },
   ]
 
   return (
@@ -284,6 +368,7 @@ const RideRequestPage = () => {
                 <input type="hidden" {...register("pickupLng")} />
                 <input type="hidden" {...register("destinationLat")} />
                 <input type="hidden" {...register("destinationLng")} />
+                <input type="hidden" {...register("selectedDriverId")} />
 
                 {/* Route information */}
                 {routeInfo && (
@@ -325,11 +410,13 @@ const RideRequestPage = () => {
                 mode="passenger"
                 onLocationSelect={handleLocationSelect}
                 onRouteCalculated={handleRouteCalculated}
+                onRideSelect={handleRideSelect}
                 center={{ lat: 33.5731, lng: -7.5898 }}
                 zoom={12}
                 height="500px"
                 pickupLocation={pickupLocation}
                 destinationLocation={destinationLocation}
+                availableDrivers={showDriversOnMap ? availableDrivers : []}
               />
             </Card>
           </div>
@@ -369,39 +456,64 @@ const RideRequestPage = () => {
               ))}
             </div>
 
-            {/* Available drivers */}
-            {availableDrivers.length > 0 && (
-              <div className="mt-8">
-                <h4 className="font-semibold mb-4">Chauffeurs disponibles</h4>
-                <div className="space-y-3">
-                  {availableDrivers.map((driver) => (
-                    <div key={driver.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
-                          {driver.name.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-medium">{driver.name}</div>
-                          <div className="text-sm text-gray-600">{driver.vehicle}</div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center gap-1 mb-1">
-                          <span className="text-yellow-400">★</span>
-                          <span className="text-sm font-medium">{driver.rating}</span>
-                        </div>
-                        <div className="text-sm text-gray-600">{driver.distance}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </Card>
         )}
 
-        {/* Step 3: Details */}
+        {/* Step 3: Driver Selection */}
         {currentStep === 3 && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Driver Selection */}
+            <div className="lg:col-span-2">
+              <DriverSelection
+                pickupLocation={pickupLocation}
+                destinationLocation={destinationLocation}
+                routeInfo={routeInfo}
+                vehicleType={watchedValues.vehicleType}
+                passengers={watchedValues.passengers}
+                onDriverSelect={handleDriverSelect}
+                onShowOnMap={handleShowDriverOnMap}
+                maxDistance={5}
+              />
+            </div>
+
+            {/* Carte avec chauffeurs */}
+            <div className="lg:col-span-1">
+              <Card className="p-6">
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-text-dark">Chauffeurs à proximité</h3>
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="checkbox"
+                      id="showDrivers"
+                      checked={showDriversOnMap}
+                      onChange={(e) => setShowDriversOnMap(e.target.checked)}
+                      className="rounded border-gray-300 text-primary focus:ring-primary"
+                    />
+                    <label htmlFor="showDrivers" className="text-sm text-text-secondary">
+                      Afficher sur la carte
+                    </label>
+                  </div>
+                </div>
+                <InteractiveMap
+                  mode="passenger"
+                  onRideSelect={handleRideSelect}
+                  center={pickupLocation?.coordinates ? {
+                    lat: pickupLocation.coordinates[1],
+                    lng: pickupLocation.coordinates[0]
+                  } : { lat: 33.5731, lng: -7.5898 }}
+                  zoom={14}
+                  height="400px"
+                  pickupLocation={pickupLocation}
+                  destinationLocation={destinationLocation}
+                  availableDrivers={showDriversOnMap ? availableDrivers : []}
+                />
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Step 4: Details */}
+        {currentStep === 4 && (
           <Card className="p-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -452,8 +564,8 @@ const RideRequestPage = () => {
           </Card>
         )}
 
-        {/* Step 4: Confirmation */}
-        {currentStep === 4 && (
+        {/* Step 5: Confirmation */}
+        {currentStep === 5 && (
           <Card className="p-8">
             <h3 className="text-xl font-semibold mb-6">Récapitulatif de votre course</h3>
 
@@ -503,6 +615,26 @@ const RideRequestPage = () => {
                 </div>
               </div>
 
+              {/* Selected driver */}
+              {selectedDriver && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white font-semibold text-lg">
+                      {selectedDriver.name.split(' ').map(n => n.charAt(0)).join('')}
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-text-dark">{selectedDriver.name}</div>
+                      <div className="text-sm text-text-secondary">
+                        {selectedDriver.vehicle.make} {selectedDriver.vehicle.model} • ⭐ {selectedDriver.rating}
+                      </div>
+                      <div className="text-sm text-green-600">
+                        Arrivée dans {selectedDriver.estimatedArrival} min
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Final price */}
               {estimatedPrice && (
                 <div className="bg-primary bg-opacity-10 border border-primary rounded-lg p-6">
@@ -512,6 +644,11 @@ const RideRequestPage = () => {
                       <div className="text-sm text-gray-600">
                         Distance: {routeInfo?.distanceText} • Durée: {routeInfo?.durationText}
                       </div>
+                      {selectedDriver && (
+                        <div className="text-sm text-gray-600">
+                          Chauffeur: {selectedDriver.name}
+                        </div>
+                      )}
                     </div>
                     <div className="text-3xl font-bold text-primary">{estimatedPrice.formattedTotal}</div>
                   </div>
@@ -534,7 +671,7 @@ const RideRequestPage = () => {
             Précédent
           </Button>
 
-          {currentStep < 4 ? (
+          {currentStep < 5 ? (
             <Button type="button" onClick={nextStep} icon={<ArrowRight className="w-4 h-4" />}>
               Suivant
             </Button>

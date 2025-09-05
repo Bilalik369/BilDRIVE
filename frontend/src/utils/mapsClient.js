@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://backend-bildrive-fmebbghucmhnemes.francecentral-01.azurewebsites.net/api';
 
 // Create axios instance with base configuration
 const mapsAPI = axios.create({
@@ -182,9 +182,28 @@ export const formatDuration = (seconds) => {
 export const formatAddress = (address) => {
   // Clean up address formatting
   if (!address) return '';
-  
+
   // Remove extra commas and spaces
   return address.replace(/,\s*,/g, ',').replace(/^\s*,\s*/, '').replace(/\s*,\s*$/, '').trim();
+};
+
+// Calculate distance between two coordinates using Haversine formula
+export const calculateHaversineDistance = (coord1, coord2) => {
+  const [lng1, lat1] = coord1;
+  const [lng2, lat2] = coord2;
+
+  const R = 6371000; // Earth's radius in meters
+  const φ1 = (lat1 * Math.PI) / 180;
+  const φ2 = (lat2 * Math.PI) / 180;
+  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+  const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+           Math.cos(φ1) * Math.cos(φ2) *
+           Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c; // Distance in meters
 };
 
 // Mock data for development/testing
@@ -223,5 +242,6 @@ export default {
   formatDistance,
   formatDuration,
   formatAddress,
+  calculateHaversineDistance,
   MOCK_DATA
 };

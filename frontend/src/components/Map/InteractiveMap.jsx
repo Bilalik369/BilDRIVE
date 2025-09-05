@@ -8,18 +8,23 @@ const InteractiveMap = ({
   onLocationSelect,
   onRouteCalculated,
   onDriverLocationUpdate,
+  onRideSelect,
   center = { lat: 33.5731, lng: -7.5898 }, // Casablanca
   zoom = 12,
   height = '400px',
   pickupLocation = null,
   destinationLocation = null,
   driverLocation = null,
-  nearbyRides = []
+  nearbyRides = [],
+  availableDrivers = [],
+  showDriverRadius = false,
+  radiusKm = 5
 }) => {
   const mapRef = useRef(null);
   const mapInstanceRef = useRef(null);
   const markersRef = useRef({});
   const polylineRef = useRef(null);
+  const radiusCircleRef = useRef(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [clickCount, setClickCount] = useState(0);
 
@@ -177,30 +182,68 @@ const InteractiveMap = ({
       }
     }
 
+    // Available drivers markers (for passenger mode)
+    if (mode === 'passenger' && availableDrivers?.length > 0) {
+      availableDrivers.forEach((driver, index) => {
+        if (driver.location?.coordinates) {
+          const [lng, lat] = driver.location.coordinates;
+          const marker = new window.google.maps.Marker({
+            position: { lat, lng },
+            map: mapInstanceRef.current,
+            title: `${driver.name} - ${driver.vehicle || 'Véhicule'} - ${driver.rating}⭐`,
+            icon: {
+              url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                <svg width="35" height="35" viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="17.5" cy="17.5" r="15" fill="#4CAF50" stroke="white" stroke-width="3"/>
+                  <text x="17.5" y="22" text-anchor="middle" fill="white" font-size="14" font-weight="bold">🚗</text>
+                </svg>
+              `),
+              scaledSize: new window.google.maps.Size(35, 35),
+              anchor: new window.google.maps.Point(17.5, 17.5)
+            }
+          });
+
+          // Add click listener for driver selection
+          marker.addListener('click', () => {
+            onRideSelect && onRideSelect('driver', driver);
+          });
+
+          markersRef.current[`driver_${index}`] = marker;
+        }
+      });
+    }
+
     // Nearby rides markers (for driver mode)
     if (mode === 'driver' && nearbyRides?.length > 0) {
       nearbyRides.forEach((ride, index) => {
         if (ride.pickup?.coordinates) {
           const [lng, lat] = ride.pickup.coordinates;
-          markersRef.current[`ride_${index}`] = new window.google.maps.Marker({
+          const marker = new window.google.maps.Marker({
             position: { lat, lng },
             map: mapInstanceRef.current,
-            title: `Ride Request - ${ride.destination?.address || 'Unknown destination'}`,
+            title: `Course de ${ride.passenger?.name || 'Passager'} vers ${ride.destination?.address || 'Destination inconnue'}`,
             icon: {
               url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="15" cy="15" r="12" fill="#FF9800" stroke="white" stroke-width="2"/>
-                  <text x="15" y="19" text-anchor="middle" fill="white" font-size="10" font-weight="bold">R</text>
+                <svg width="35" height="35" viewBox="0 0 35 35" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="17.5" cy="17.5" r="15" fill="#FF9800" stroke="white" stroke-width="3"/>
+                  <text x="17.5" y="22" text-anchor="middle" fill="white" font-size="10" font-weight="bold">👤</text>
                 </svg>
               `),
-              scaledSize: new window.google.maps.Size(30, 30),
-              anchor: new window.google.maps.Point(15, 15)
+              scaledSize: new window.google.maps.Size(35, 35),
+              anchor: new window.google.maps.Point(17.5, 17.5)
             }
           });
+
+          // Add click listener for ride selection
+          marker.addListener('click', () => {
+            onRideSelect && onRideSelect('ride', ride);
+          });
+
+          markersRef.current[`ride_${index}`] = marker;
         }
       });
     }
-  }, [isMapLoaded, pickupLocation, destinationLocation, driverLocation, nearbyRides, mode, onDriverLocationUpdate]);
+  }, [isMapLoaded, pickupLocation, destinationLocation, driverLocation, nearbyRides, availableDrivers, mode, onDriverLocationUpdate, onRideSelect]);
 
   // Update route when pickup and destination are available
   const updateRoute = useCallback(async () => {
@@ -266,6 +309,39 @@ const InteractiveMap = ({
     updateRoute();
   }, [updateRoute]);
 
+  // Update radius circle when driver location or radius changes
+  const updateRadiusCircle = useCallback(() => {
+    if (!mapInstanceRef.current || !isMapLoaded) return;
+
+    // Clear existing radius circle
+    if (radiusCircleRef.current) {
+      radiusCircleRef.current.setMap(null);
+      radiusCircleRef.current = null;
+    }
+
+    // Show radius circle for driver mode when showDriverRadius is true
+    if (mode === 'driver' && showDriverRadius && driverLocation?.coordinates) {
+      const [lng, lat] = driverLocation.coordinates;
+
+      radiusCircleRef.current = new window.google.maps.Circle({
+        strokeColor: '#4CAF50',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: '#4CAF50',
+        fillOpacity: 0.1,
+        map: mapInstanceRef.current,
+        center: { lat, lng },
+        radius: radiusKm * 1000, // Convert km to meters
+        clickable: false
+      });
+    }
+  }, [isMapLoaded, mode, showDriverRadius, driverLocation, radiusKm]);
+
+  // Update radius circle when relevant props change
+  useEffect(() => {
+    updateRadiusCircle();
+  }, [updateRadiusCircle]);
+
   // Reset click count when switching modes or clearing locations
   useEffect(() => {
     if (!pickupLocation && !destinationLocation) {
@@ -292,9 +368,27 @@ const InteractiveMap = ({
 
       {mode === 'passenger' && isMapLoaded && (
         <div className="absolute top-4 left-4 bg-white px-3 py-2 rounded-lg shadow-md text-sm">
-          {clickCount === 0 && "Click on the map to set pickup location"}
-          {clickCount === 1 && "Click on the map to set destination"}
-          {clickCount >= 2 && "Route calculated"}
+          {clickCount === 0 && "Cliquez sur la carte pour définir le départ"}
+          {clickCount === 1 && "Cliquez sur la carte pour définir la destination"}
+          {clickCount >= 2 && "Itinéraire calculé"}
+        </div>
+      )}
+
+      {mode === 'driver' && isMapLoaded && showDriverRadius && (
+        <div className="absolute top-4 left-4 bg-white px-3 py-2 rounded-lg shadow-md text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full opacity-60"></div>
+            <span>Zone de recherche ({radiusKm}km)</span>
+          </div>
+        </div>
+      )}
+
+      {mode === 'passenger' && availableDrivers?.length > 0 && (
+        <div className="absolute top-4 right-4 bg-white px-3 py-2 rounded-lg shadow-md text-sm">
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span>{availableDrivers.length} chauffeur{availableDrivers.length > 1 ? 's' : ''} disponible{availableDrivers.length > 1 ? 's' : ''}</span>
+          </div>
         </div>
       )}
     </div>
