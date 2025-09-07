@@ -22,6 +22,7 @@ const Navbar = () => {
     dispatch(logout())
     navigate("/")
     setIsProfileOpen(false)
+    setIsMenuOpen(false) // Close mobile menu on logout
   }
 
   const toggleMenu = () => {
@@ -74,13 +75,13 @@ const Navbar = () => {
               variant="ghost"
               size="sm"
               onClick={() => dispatch(toggleTheme())}
-              icon={theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              icon={theme === "light" ? <Moon className="w-4 h-4 text-orange-500" /> : <Sun className="w-4 h-4 text-orange-500" />}
             />
 
             {isAuthenticated ? (
               <div className="relative">
                 {/* Notifications */}
-                <Button variant="ghost" size="sm" icon={<Bell className="w-4 h-4" />} className="mr-2" />
+                <Button variant="ghost" size="sm" icon={<Bell className="w-4 h-4 text-orange-500" />} className="mr-2" />
 
                 {/* Profile dropdown */}
                 <div className="relative">
@@ -90,46 +91,46 @@ const Navbar = () => {
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                     className="flex items-center space-x-2"
                   >
-                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
                       <span className="text-white text-sm font-medium">
                         {user?.firstName?.charAt(0)}
                         {user?.lastName?.charAt(0)}
                       </span>
                     </div>
-                    <span className="text-sm font-medium text-text-dark">
+                    <span className="text-sm font-medium text-gray-800">
                       {user?.firstName} {user?.lastName}
                     </span>
                   </Button>
 
                   {/* Dropdown menu */}
                   {isProfileOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-border-color">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200">
                       <div className="py-1">
                         <Link
                           to="/dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-text-dark hover:bg-bg-main"
+                          className="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-50"
                           onClick={() => setIsProfileOpen(false)}
                         >
-                          <User className="w-4 h-4 mr-2" />
+                          <User className="w-4 h-4 mr-2 text-gray-600" />
                           Dashboard
                         </Link>
                         <Link
                           to="/profile"
-                          className="flex items-center px-4 py-2 text-sm text-text-dark hover:bg-bg-main"
+                          className="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-50"
                           onClick={() => setIsProfileOpen(false)}
                         >
-                          <User className="w-4 h-4 mr-2" />
+                          <User className="w-4 h-4 mr-2 text-gray-600" />
                           Profile
                         </Link>
                         <Link
                           to="/settings"
-                          className="flex items-center px-4 py-2 text-sm text-text-dark hover:bg-bg-main"
+                          className="flex items-center px-4 py-2 text-sm text-gray-800 hover:bg-gray-50"
                           onClick={() => setIsProfileOpen(false)}
                         >
-                          <Settings className="w-4 h-4 mr-2" />
+                          <Settings className="w-4 h-4 mr-2 text-gray-600" />
                           Settings
                         </Link>
-                        <hr className="my-1" />
+                        <hr className="my-1 border-gray-200" />
                         <button
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
@@ -172,15 +173,15 @@ const Navbar = () => {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-bg-main">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-gray-50">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   className={`block px-3 py-2 text-base font-medium rounded-md transition-colors duration-200 ${
                     isActive(link.path)
-                      ? "text-primary bg-card-bg"
-                      : "text-text-secondary hover:text-primary hover:bg-card-bg"
+                      ? "text-primary bg-white"
+                      : "text-gray-700 hover:text-primary hover:bg-white"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -188,8 +189,58 @@ const Navbar = () => {
                 </Link>
               ))}
 
-              {!isAuthenticated && (
-                <div className="pt-4 space-y-2">
+              {isAuthenticated ? (
+                <div className="pt-4 space-y-2 border-t border-gray-200">
+                  {/* Mobile user profile section */}
+                  <div className="flex items-center px-3 py-2 space-x-3">
+                    <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm font-medium">
+                        {user?.firstName?.charAt(0)}
+                        {user?.lastName?.charAt(0)}
+                      </span>
+                    </div>
+                    <span className="text-sm font-medium text-gray-800">
+                      {user?.firstName} {user?.lastName}
+                    </span>
+                  </div>
+                  
+                  {/* Mobile menu items */}
+                  <Link
+                    to="/dashboard"
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-white rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="w-4 h-4 mr-3 text-gray-600" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/profile"
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-white rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="w-4 h-4 mr-3 text-gray-600" />
+                    Profile
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-white rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Settings className="w-4 h-4 mr-3 text-gray-600" />
+                    Settings
+                  </Link>
+                  
+                  {/* Mobile logout - FIXED VISIBILITY ISSUE */}
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md"
+                  >
+                    <LogOut className="w-4 h-4 mr-3" />
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-4 space-y-2 border-t border-gray-200">
                   <Link to="/auth/login" onClick={() => setIsMenuOpen(false)}>
                     <Button variant="ghost" size="sm" className="w-full">
                       Login
