@@ -1,7 +1,5 @@
-"use client"
-
 import { useState, useEffect } from "react"
-import { Plus, Clock, MapPin, Car, Star, Filter, Search } from 'lucide-react'
+import { Plus, Clock, MapPin, Car, Star, Filter, Search, TrendingUp, Users, Calendar, Navigation, ArrowRight } from 'lucide-react'
 import { useNavigate } from "react-router-dom"
 import Button from "../../components/ui/Button"
 import Card from "../../components/ui/Card"
@@ -54,210 +52,332 @@ const RideDashboard = () => {
   if (loading) return <Loading />
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      {/* En-tête */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Bonjour, {user?.firstName} 👋
-          </h1>
-          <p className="text-gray-600">Où souhaitez-vous aller aujourd'hui ?</p>
-        </div>
-        <Button 
-          size="lg" 
-          icon={<Plus className="w-5 h-5" />}
-          onClick={() => navigate("/ride/request")}
-          className="mt-4 md:mt-0"
-        >
-          Nouvelle Course
-        </Button>
-      </div>
-
-      {/* Course active */}
-      {currentRide && (
-        <Card className="p-6 mb-8 border-l-4 border-l-primary">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Course en cours</h2>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentRide.status)}`}>
-              {currentRide.status}
-            </span>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-green-500" />
-              <div>
-                <p className="text-sm text-gray-600">Départ</p>
-                <p className="font-medium">{currentRide.pickup.address}</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        {/* Modern Header */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <Car className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">
+                    Bonjour, {user?.firstName} 👋
+                  </h1>
+                  <p className="text-gray-600">Où souhaitez-vous aller aujourd'hui ?</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="w-5 h-5 text-red-500" />
-              <div>
-                <p className="text-sm text-gray-600">Destination</p>
-                <p className="font-medium">{currentRide.destination.address}</p>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Prix</p>
-                <p className="font-bold text-primary text-lg">
-                  {formatCurrency(currentRide.price.total)}
-                </p>
-              </div>
+            
+            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
               <Button 
-                variant="outline" 
-                onClick={() => navigate(`/ride/tracking/${currentRide._id}`)}
-                className="bg-transparent"
+                size="lg" 
+                icon={<Plus className="w-5 h-5" />}
+                onClick={() => navigate("/ride/request")}
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 shadow-lg"
               >
-                Suivre
+                Nouvelle Course
+              </Button>
+              <Button 
+                variant="outline"
+                size="lg"
+                icon={<Navigation className="w-5 h-5" />}
+                onClick={() => navigate("/ride/history")}
+                className="w-full sm:w-auto"
+              >
+                Mes Courses
               </Button>
             </div>
           </div>
-        </Card>
-      )}
-
-      {/* Statistiques */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card className="p-6 text-center">
-          <div className="text-3xl font-bold text-primary mb-2">{stats.total}</div>
-          <div className="text-gray-600">Total courses</div>
-        </Card>
-        <Card className="p-6 text-center">
-          <div className="text-3xl font-bold text-green-600 mb-2">{stats.completed}</div>
-          <div className="text-gray-600">Terminées</div>
-        </Card>
-        <Card className="p-6 text-center">
-          <div className="text-3xl font-bold text-red-600 mb-2">{stats.cancelled}</div>
-          <div className="text-gray-600">Annulées</div>
-        </Card>
-        <Card className="p-6 text-center">
-          <div className="text-3xl font-bold text-purple-600 mb-2">
-            {formatCurrency(stats.totalSpent)}
-          </div>
-          <div className="text-gray-600">Total dépensé</div>
-        </Card>
-      </div>
-
-      {/* Filtres et recherche */}
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="flex items-center gap-2 flex-1">
-          <Search className="w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Rechercher par adresse..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-        </div>
-        <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-gray-400" />
-          <select
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="all">Toutes les courses</option>
-            <option value={RIDE_STATUS.COMPLETED}>Terminées</option>
-            <option value={RIDE_STATUS.CANCELLED}>Annulées</option>
-            <option value={RIDE_STATUS.SCHEDULED}>Programmées</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Liste des courses récentes */}
-      <Card className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Courses récentes</h2>
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate("/ride/history")}
-          >
-            Voir tout
-          </Button>
         </div>
 
-        {filteredRides.length === 0 ? (
-          <div className="text-center py-12">
-            <Car className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
-              Aucune course trouvée
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Commencez par demander votre première course
-            </p>
-            <Button onClick={() => navigate("/ride/request")}>
-              Demander une course
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredRides.slice(0, 5).map((ride) => (
-              <div
-                key={ride._id}
-                className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                onClick={() => navigate(`/ride/details/${ride._id}`)}
-              >
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="flex flex-col items-center">
-                    <MapPin className="w-4 h-4 text-green-500 mb-1" />
-                    <div className="w-px h-6 bg-gray-300"></div>
-                    <MapPin className="w-4 h-4 text-red-500 mt-1" />
+        {/* Active Ride Card */}
+        {currentRide && (
+          <Card className="mb-8 overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+                    <Navigation className="w-5 h-5 text-white" />
                   </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-sm mb-1">
-                      {ride.pickup.address}
-                    </div>
-                    <div className="text-gray-600 text-sm">
-                      {ride.destination.address}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {formatDate(ride.createdAt)}
-                    </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Course en cours</h2>
+                    <p className="text-sm text-gray-600">Suivez votre course en temps réel</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-bold text-primary mb-1">
-                    {formatCurrency(ride.price.total)}
-                  </div>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ride.status)}`}>
-                    {ride.status}
-                  </span>
+                <div className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(currentRide.status)}`}>
+                  {currentRide.status}
                 </div>
               </div>
-            ))}
-          </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2">
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <MapPin className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Départ</p>
+                        <p className="font-semibold text-gray-900">{currentRide.pickup.address}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-start gap-4">
+                      <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                        <MapPin className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">Destination</p>
+                        <p className="font-semibold text-gray-900">{currentRide.destination.address}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex flex-col justify-between">
+                  <div className="text-center mb-4">
+                    <p className="text-sm text-gray-500 mb-1">Prix total</p>
+                    <p className="text-3xl font-bold text-orange-600">
+                      {currentRide.price.total.toFixed(2)} DH
+                    </p>
+                  </div>
+                  <Button 
+                    onClick={() => navigate(`/ride/tracking/${currentRide._id}`)}
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                    icon={<ArrowRight className="w-4 h-4" />}
+                  >
+                    Suivre la course
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Card>
         )}
-      </Card>
 
-      {/* Actions rapides */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-        <Card 
-          className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/ride/scheduled")}
-        >
-          <Clock className="w-8 h-8 text-blue-500 mb-4" />
-          <h3 className="font-semibold mb-2">Courses programmées</h3>
-          <p className="text-gray-600 text-sm">Gérez vos courses planifiées</p>
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Total Courses</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <Car className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
+          
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Terminées</p>
+                <p className="text-3xl font-bold text-green-600">{stats.completed}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
+          
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Annulées</p>
+                <p className="text-3xl font-bold text-red-600">{stats.cancelled}</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-red-600 rounded-xl flex items-center justify-center">
+                <Clock className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
+          
+          <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600 mb-1">Total Dépensé</p>
+                <p className="text-2xl font-bold text-purple-600">{stats.totalSpent.toFixed(2)} DH</p>
+              </div>
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Search and Filter Section */}
+        <Card className="p-6 mb-8 border-0 shadow-lg">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex items-center gap-3 flex-1">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Rechercher par adresse..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50"
+                />
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Filter className="w-5 h-5 text-gray-400" />
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 min-w-[180px]"
+              >
+                <option value="all">Toutes les courses</option>
+                <option value={RIDE_STATUS.COMPLETED}>Terminées</option>
+                <option value={RIDE_STATUS.CANCELLED}>Annulées</option>
+                <option value={RIDE_STATUS.SCHEDULED}>Programmées</option>
+              </select>
+            </div>
+          </div>
         </Card>
-        
-        <Card 
-          className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/ride/history")}
-        >
-          <Star className="w-8 h-8 text-yellow-500 mb-4" />
-          <h3 className="font-semibold mb-2">Historique complet</h3>
-          <p className="text-gray-600 text-sm">Consultez toutes vos courses</p>
+
+        {/* Recent Rides Section */}
+        <Card className="border-0 shadow-lg">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Courses récentes</h2>
+                <p className="text-gray-600">Vos dernières courses</p>
+              </div>
+              <Button 
+                variant="outline" 
+                onClick={() => navigate("/ride/history")}
+                icon={<ArrowRight className="w-4 h-4" />}
+                className="bg-transparent"
+              >
+                Voir tout
+              </Button>
+            </div>
+
+            {filteredRides.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Car className="w-10 h-10 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-600 mb-3">
+                  Aucune course trouvée
+                </h3>
+                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                  Commencez par demander votre première course et elle apparaîtra ici
+                </p>
+                <Button 
+                  onClick={() => navigate("/ride/request")}
+                  className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700"
+                  icon={<Plus className="w-5 h-5" />}
+                >
+                  Demander une course
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filteredRides.slice(0, 5).map((ride) => (
+                  <div
+                    key={ride._id}
+                    className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-orange-200 cursor-pointer transition-all duration-300 overflow-hidden"
+                    onClick={() => navigate(`/ride/details/${ride._id}`)}
+                  >
+                    {/* Price Badge - Outside the card */}
+                    <div className="absolute top-3 right-3 z-10">
+                      <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+                        {ride.price.total.toFixed(2)} DH
+                      </div>
+                    </div>
+
+                    <div className="p-4 pr-20">
+                      <div className="flex items-start gap-3">
+                        <div className="flex flex-col items-center mt-1">
+                          <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                            <MapPin className="w-3 h-3 text-white" />
+                          </div>
+                          <div className="w-px h-6 bg-gray-300 my-1"></div>
+                          <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
+                            <MapPin className="w-3 h-3 text-white" />
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-gray-900 text-sm mb-1 truncate">
+                            {ride.pickup.address}
+                          </div>
+                          <div className="text-gray-600 text-xs mb-2 truncate">
+                            {ride.destination.address}
+                          </div>
+                          <div className="flex items-center justify-between text-xs text-gray-500">
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {formatDate(ride.createdAt)}
+                            </span>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ride.status)}`}>
+                              {ride.status}
+                            </span>
+                          </div>
+                          <div className="mt-2 text-xs text-gray-500">
+                            {ride.distance ? `${(ride.distance / 1000).toFixed(1)} km` : 'N/A'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </Card>
-        
-        <Card 
-          className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => navigate("/profile")}
-        >
-          <Car className="w-8 h-8 text-green-500 mb-4" />
-          <h3 className="font-semibold mb-2">Mon profil</h3>
-          <p className="text-gray-600 text-sm">Gérez vos informations</p>
-        </Card>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200"
+            onClick={() => navigate("/ride/scheduled")}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Courses programmées</h3>
+                <p className="text-gray-600 text-sm">Gérez vos courses planifiées</p>
+              </div>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200"
+            onClick={() => navigate("/ride/history")}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Historique complet</h3>
+                <p className="text-gray-600 text-sm">Consultez toutes vos courses</p>
+              </div>
+            </div>
+          </Card>
+          
+          <Card 
+            className="p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200"
+            onClick={() => navigate("/profile")}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 mb-1">Mon profil</h3>
+                <p className="text-gray-600 text-sm">Gérez vos informations</p>
+              </div>
+            </div>
+          </Card>
+        </div>
       </div>
     </div>
   )

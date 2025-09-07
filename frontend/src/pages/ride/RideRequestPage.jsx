@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { MapPin, Clock, Car, CreditCard, Users, Calendar, ArrowRight, ArrowLeft } from "lucide-react"
@@ -212,45 +210,54 @@ const RideRequestPage = () => {
   ]
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      {/* Progress indicator */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          {steps.map((step, index) => {
-            const StepIcon = step.icon
-            return (
-              <div key={step.number} className="flex items-center">
-                <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                    currentStep >= step.number ? "bg-primary text-white" : "bg-gray-200 text-gray-500"
-                  }`}
-                >
-                  <StepIcon className="w-6 h-6" />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="max-w-6xl mx-auto p-4 sm:p-6">
+        {/* Modern Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            {steps.map((step, index) => {
+              const StepIcon = step.icon
+              const isActive = currentStep === step.number
+              const isCompleted = currentStep > step.number
+              return (
+                <div key={step.number} className="flex items-center">
+                  <div
+                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isCompleted 
+                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg" 
+                        : isActive 
+                        ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-110" 
+                        : "bg-gray-200 text-gray-500"
+                    }`}
+                  >
+                    <StepIcon className="w-6 h-6" />
+                  </div>
+                  {index < steps.length - 1 && (
+                    <div className={`w-20 h-1 mx-3 transition-all duration-300 ${
+                      isCompleted ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gray-200"
+                    }`} />
+                  )}
                 </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-16 h-1 mx-2 ${currentStep > step.number ? "bg-primary" : "bg-gray-200"}`} />
-                )}
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{steps[currentStep - 1].title}</h2>
+            <p className="text-gray-600 text-lg">
+              Étape {currentStep} sur {steps.length}
+            </p>
+          </div>
         </div>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">{steps[currentStep - 1].title}</h2>
-          <p className="text-gray-600">
-            Étape {currentStep} sur {steps.length}
-          </p>
-        </div>
-      </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Step 1: Destination with Interactive Map */}
         {currentStep === 1 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left side - Search inputs */}
-            <Card className="p-6">
-              <div className="space-y-6">
+            <Card className="p-8 border-0 shadow-xl">
+              <div className="space-y-8">
                 <div className="relative">
-                  <label className="block text-sm font-medium mb-2">Point de départ</label>
+                  <label className="block text-lg font-semibold text-gray-900 mb-3">Point de départ</label>
                   <LocationSearch
                     placeholder="Entrez l'adresse de départ"
                     value={pickupLocation?.address || ''}
@@ -259,17 +266,17 @@ const RideRequestPage = () => {
                   />
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="mt-2"
+                    className="mt-3 bg-transparent border-orange-200 text-orange-600 hover:bg-orange-50"
                     onClick={getCurrentLocation}
                   >
-                    Utiliser ma position actuelle
+                    📍 Utiliser ma position actuelle
                   </Button>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Destination</label>
+                  <label className="block text-lg font-semibold text-gray-900 mb-3">Destination</label>
                   <LocationSearch
                     placeholder="Où souhaitez-vous aller ?"
                     value={destinationLocation?.address || ''}
@@ -287,30 +294,37 @@ const RideRequestPage = () => {
 
                 {/* Route information */}
                 {routeInfo && (
-                  <RouteInfo
-                    distance={routeInfo.distanceText}
-                    duration={routeInfo.durationText}
-                    price={estimatedPrice?.formattedTotal}
-                    loading={mapLoading}
-                  />
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                    <RouteInfo
+                      distance={routeInfo.distanceText}
+                      duration={routeInfo.durationText}
+                      price={estimatedPrice?.formattedTotal}
+                      loading={mapLoading}
+                    />
+                  </div>
                 )}
 
                 {/* Recent addresses */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium mb-3">Adresses récentes</h4>
-                  <div className="space-y-2">
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-gray-600" />
+                    Adresses récentes
+                  </h4>
+                  <div className="space-y-3">
                     {["Aéroport Mohammed V", "Gare Casa-Port", "Twin Center"].map((address) => (
                       <button
                         key={address}
                         type="button"
-                        className="w-full text-left p-2 hover:bg-white rounded transition-colors"
+                        className="w-full text-left p-4 hover:bg-white rounded-lg transition-all duration-200 border border-transparent hover:border-orange-200 hover:shadow-sm"
                         onClick={() => {
                           const location = { address, coordinates: null }
                           handleLocationSelect('destination', location)
                         }}
                       >
-                        <MapPin className="w-4 h-4 inline mr-2 text-gray-400" />
-                        {address}
+                        <div className="flex items-center gap-3">
+                          <MapPin className="w-4 h-4 text-gray-400" />
+                          <span className="text-gray-700">{address}</span>
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -319,8 +333,11 @@ const RideRequestPage = () => {
             </Card>
 
             {/* Right side - Interactive Map */}
-            <Card className="p-6">
-              <h3 className="text-lg font-semibold mb-4">Sélectionnez sur la carte</h3>
+            <Card className="p-6 border-0 shadow-xl">
+              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                <MapPin className="w-6 h-6 text-orange-500" />
+                Sélectionnez sur la carte
+              </h3>
               <InteractiveMap
                 mode="passenger"
                 onLocationSelect={handleLocationSelect}
@@ -337,17 +354,18 @@ const RideRequestPage = () => {
 
         {/* Step 2: Vehicle type */}
         {currentStep === 2 && (
-          <Card className="p-8">
+          <Card className="p-8 border-0 shadow-xl">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Choisissez votre véhicule</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {vehicleOptions.map((option) => (
                 <label
                   key={option.value}
                   className={`
-                    relative flex flex-col items-center p-6 border-2 rounded-xl cursor-pointer transition-all
+                    relative flex flex-col items-center p-8 border-2 rounded-2xl cursor-pointer transition-all duration-300 group
                     ${
                       watchedValues.vehicleType === option.value
-                        ? "border-primary bg-primary bg-opacity-10"
-                        : "border-gray-200 hover:border-primary hover:bg-primary hover:bg-opacity-5"
+                        ? "border-orange-500 bg-gradient-to-br from-orange-50 to-orange-100 shadow-lg scale-105"
+                        : "border-gray-200 hover:border-orange-300 hover:bg-orange-50 hover:shadow-md"
                     }
                   `}
                 >
@@ -357,12 +375,17 @@ const RideRequestPage = () => {
                     className="sr-only"
                     {...register("vehicleType", { required: "Veuillez sélectionner un type de véhicule" })}
                   />
-                  <div className="text-4xl mb-3">{option.icon}</div>
-                  <div className="text-lg font-semibold mb-1">{option.label}</div>
-                  <div className="text-sm text-gray-600 text-center mb-3">{option.description}</div>
+                  <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">{option.icon}</div>
+                  <div className="text-xl font-bold mb-2 text-gray-900">{option.label}</div>
+                  <div className="text-gray-600 text-center mb-4">{option.description}</div>
                   {estimatedPrice && (
-                    <div className="text-lg font-bold text-primary">
+                    <div className="text-2xl font-bold text-orange-600">
                       {calculatePrice(routeInfo?.distance || 0, routeInfo?.duration || 0, option.value).formattedTotal}
+                    </div>
+                  )}
+                  {watchedValues.vehicleType === option.value && (
+                    <div className="absolute top-4 right-4 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                   )}
                 </label>
@@ -371,24 +394,24 @@ const RideRequestPage = () => {
 
             {/* Available drivers */}
             {availableDrivers.length > 0 && (
-              <div className="mt-8">
-                <h4 className="font-semibold mb-4">Chauffeurs disponibles</h4>
-                <div className="space-y-3">
+              <div className="mt-12">
+                <h4 className="text-xl font-bold text-gray-900 mb-6 text-center">Chauffeurs disponibles</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {availableDrivers.map((driver) => (
-                    <div key={driver.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-semibold">
+                    <div key={driver.id} className="flex items-center justify-between p-6 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-md transition-all duration-300">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                           {driver.name.charAt(0)}
                         </div>
                         <div>
-                          <div className="font-medium">{driver.name}</div>
+                          <div className="font-semibold text-gray-900">{driver.name}</div>
                           <div className="text-sm text-gray-600">{driver.vehicle}</div>
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="flex items-center gap-1 mb-1">
-                          <span className="text-yellow-400">★</span>
-                          <span className="text-sm font-medium">{driver.rating}</span>
+                          <span className="text-yellow-400 text-lg">★</span>
+                          <span className="font-semibold text-gray-900">{driver.rating}</span>
                         </div>
                         <div className="text-sm text-gray-600">{driver.distance}</div>
                       </div>
@@ -402,12 +425,13 @@ const RideRequestPage = () => {
 
         {/* Step 3: Details */}
         {currentStep === 3 && (
-          <Card className="p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="p-8 border-0 shadow-xl">
+            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Détails de votre course</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <label className="block text-sm font-medium mb-2">Nombre de passagers</label>
+                <label className="block text-lg font-semibold text-gray-900 mb-3">Nombre de passagers</label>
                 <select
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 text-lg"
                   {...register("passengers", { required: "Sélectionnez le nombre de passagers" })}
                 >
                   {[1, 2, 3, 4, 5, 6].map((num) => (
@@ -419,19 +443,19 @@ const RideRequestPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Méthode de paiement</label>
+                <label className="block text-lg font-semibold text-gray-900 mb-3">Méthode de paiement</label>
                 <select
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent bg-gray-50 text-lg"
                   {...register("paymentMethod")}
                 >
-                  <option value={PAYMENT_METHODS.CASH}>Espèces</option>
-                  <option value={PAYMENT_METHODS.CARD}>Carte bancaire</option>
-                  <option value={PAYMENT_METHODS.PAYPAL}>PayPal</option>
+                  <option value={PAYMENT_METHODS.CASH}>💵 Espèces</option>
+                  <option value={PAYMENT_METHODS.CARD}>💳 Carte bancaire</option>
+                  <option value={PAYMENT_METHODS.PAYPAL}>🅿️ PayPal</option>
                 </select>
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-8">
               <Input
                 label="Programmer pour plus tard (Optionnel)"
                 type="datetime-local"
@@ -440,10 +464,10 @@ const RideRequestPage = () => {
               />
             </div>
 
-            <div className="mt-6">
-              <label className="block text-sm font-medium mb-2">Instructions spéciales (Optionnel)</label>
+            <div className="mt-8">
+              <label className="block text-lg font-semibold text-gray-900 mb-3">Instructions spéciales (Optionnel)</label>
               <textarea
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                className="w-full px-4 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none bg-gray-50"
                 rows="4"
                 placeholder="Instructions pour le chauffeur..."
                 {...register("notes")}
@@ -454,66 +478,74 @@ const RideRequestPage = () => {
 
         {/* Step 4: Confirmation */}
         {currentStep === 4 && (
-          <Card className="p-8">
-            <h3 className="text-xl font-semibold mb-6">Récapitulatif de votre course</h3>
+          <Card className="p-8 border-0 shadow-xl">
+            <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">Récapitulatif de votre course</h3>
 
-            <div className="space-y-6">
+            <div className="space-y-8">
               {/* Route */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-start gap-4">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-200">
+                <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                  <MapPin className="w-6 h-6 text-blue-600" />
+                  Itinéraire
+                </h4>
+                <div className="flex items-start gap-6">
                   <div className="flex flex-col items-center">
-                    <MapPin className="w-5 h-5 text-green-500" />
-                    <div className="w-px h-8 bg-gray-300 my-2"></div>
-                    <MapPin className="w-5 h-5 text-red-500" />
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="w-px h-12 bg-gray-300 my-3"></div>
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                      <MapPin className="w-4 h-4 text-white" />
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <div className="mb-4">
-                      <div className="font-medium">Départ</div>
-                      <div className="text-gray-600">{pickupLocation?.address || 'Not selected'}</div>
+                  <div className="flex-1 space-y-6">
+                    <div>
+                      <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Départ</div>
+                      <div className="text-lg font-semibold text-gray-900">{pickupLocation?.address || 'Non sélectionné'}</div>
                     </div>
                     <div>
-                      <div className="font-medium">Destination</div>
-                      <div className="text-gray-600">{destinationLocation?.address || 'Not selected'}</div>
+                      <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Destination</div>
+                      <div className="text-lg font-semibold text-gray-900">{destinationLocation?.address || 'Non sélectionné'}</div>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Details grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <Car className="w-6 h-6 mx-auto mb-2 text-gray-600" />
-                  <div className="font-medium capitalize">{watchedValues.vehicleType}</div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <Car className="w-8 h-8 mx-auto mb-3 text-gray-600" />
+                  <div className="font-bold text-lg capitalize">{watchedValues.vehicleType}</div>
                   <div className="text-sm text-gray-600">Véhicule</div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <Users className="w-6 h-6 mx-auto mb-2 text-gray-600" />
-                  <div className="font-medium">{watchedValues.passengers}</div>
+                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <Users className="w-8 h-8 mx-auto mb-3 text-gray-600" />
+                  <div className="font-bold text-lg">{watchedValues.passengers}</div>
                   <div className="text-sm text-gray-600">Passagers</div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <Clock className="w-6 h-6 mx-auto mb-2 text-gray-600" />
-                  <div className="font-medium">{routeInfo?.durationText || 'N/A'}</div>
+                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <Clock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
+                  <div className="font-bold text-lg">{routeInfo?.durationText || 'N/A'}</div>
                   <div className="text-sm text-gray-600">Durée</div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <CreditCard className="w-6 h-6 mx-auto mb-2 text-gray-600" />
-                  <div className="font-medium capitalize">{watchedValues.paymentMethod}</div>
+                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
+                  <CreditCard className="w-8 h-8 mx-auto mb-3 text-gray-600" />
+                  <div className="font-bold text-lg capitalize">{watchedValues.paymentMethod}</div>
                   <div className="text-sm text-gray-600">Paiement</div>
                 </div>
               </div>
 
               {/* Final price */}
               {estimatedPrice && (
-                <div className="bg-primary bg-opacity-10 border border-primary rounded-lg p-6">
+                <div className="bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-200 rounded-2xl p-8">
                   <div className="flex justify-between items-center">
                     <div>
-                      <div className="text-lg font-semibold">Prix estimé</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-2xl font-bold text-gray-900">Prix estimé</div>
+                      <div className="text-gray-600 mt-2">
                         Distance: {routeInfo?.distanceText} • Durée: {routeInfo?.durationText}
                       </div>
                     </div>
-                    <div className="text-3xl font-bold text-primary">{estimatedPrice.formattedTotal}</div>
+                    <div className="text-4xl font-bold text-orange-600">{estimatedPrice.formattedTotal}</div>
                   </div>
                 </div>
               )}
@@ -522,30 +554,42 @@ const RideRequestPage = () => {
         )}
 
         {/* Navigation buttons */}
-        <div className="flex justify-between mt-8">
+        <div className="flex justify-between mt-12">
           <Button
             type="button"
             variant="outline"
             onClick={prevStep}
             disabled={currentStep === 1}
-            icon={<ArrowLeft className="w-4 h-4 bg-transparent" />}
-            className="bg-transparent"
+            icon={<ArrowLeft className="w-4 h-4" />}
+            className="bg-transparent border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed px-8 py-4 text-lg"
           >
             Précédent
           </Button>
 
           {currentStep < 4 ? (
-            <Button type="button" onClick={nextStep} icon={<ArrowRight className="w-4 h-4" />}>
+            <Button 
+              type="button" 
+              onClick={nextStep} 
+              icon={<ArrowRight className="w-4 h-4" />}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 px-8 py-4 text-lg shadow-lg"
+            >
               Suivant
             </Button>
           ) : (
-            <Button type="submit" loading={loading} size="lg" icon={<Car className="w-5 h-5" />}>
+            <Button 
+              type="submit" 
+              loading={loading} 
+              size="lg" 
+              icon={<Car className="w-5 h-5" />}
+              className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-12 py-4 text-xl shadow-xl"
+            >
               {watchedValues.scheduledTime ? "Programmer la course" : "Demander maintenant"}
             </Button>
           )}
         </div>
       </form>
     </div>
+  </div>
   )
 }
 

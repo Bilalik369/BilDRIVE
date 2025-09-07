@@ -1,4 +1,7 @@
-export const formatCurrency = (amount, currency = "USD") => {
+export const formatCurrency = (amount, currency = "MAD") => {
+    if (currency === "MAD") {
+      return `${amount.toFixed(2)} DH`
+    }
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency,
