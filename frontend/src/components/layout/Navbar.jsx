@@ -70,19 +70,8 @@ const Navbar = () => {
 
           {/* Right side buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Theme toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => dispatch(toggleTheme())}
-              icon={theme === "light" ? <Moon className="w-4 h-4 text-orange-500" /> : <Sun className="w-4 h-4 text-orange-500" />}
-            />
-
             {isAuthenticated ? (
               <div className="relative">
-                {/* Notifications */}
-                <Button variant="ghost" size="sm" icon={<Bell className="w-4 h-4 text-orange-500" />} className="mr-2" />
-
                 {/* Profile dropdown */}
                 <div className="relative">
                   <Button
