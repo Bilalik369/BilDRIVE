@@ -306,7 +306,7 @@ export const verifyEmail = async (req, res, next) => {
 
     // If it's a GET request (from email link), redirect to frontend
     if (req.method === 'GET') {
-      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+      const frontendUrl = process.env.FRONTEND_URL || "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net"
       res.redirect(`${frontendUrl}/auth/login?verified=true`)
     } else {
       // If it's a POST request (from frontend API call), return JSON

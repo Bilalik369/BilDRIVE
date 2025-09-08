@@ -14,7 +14,13 @@ const server = createServer(app);
 
 initializeSocket(server);
 app.use(cors({
-  origin: ["http://localhost:3000", "http://127.0.0.1:3000"  , "http://localhost:3001","http://127.0.0.1:3001" ],
+  origin: [
+    "http://localhost:3000", 
+    "http://127.0.0.1:3000", 
+    "http://localhost:3001",
+    "http://127.0.0.1:3001",
+    "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net"
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],

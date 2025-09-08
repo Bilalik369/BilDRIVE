@@ -1,6 +1,6 @@
 {
   "command": "npm start",
-  "serverUrl": "http://localhost:3000/",
+  "serverUrl": "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net/",
   "authenticateProxy": true,
   "commitMode": "commits"
 }

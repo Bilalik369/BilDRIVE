@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 export const sendVerificationEmail = async (email, token) => {
   try {
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000"
+    const frontendUrl = process.env.FRONTEND_URL || "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net"
     const verificationUrl = `${frontendUrl}/auth/verify-email/${token}`
 
     const subject = "Vérifiez votre adresse email";
@@ -84,7 +84,7 @@ export const sendVerificationEmail = async (email, token) => {
 
 export const sendPasswordResetEmail = async (email, token) => {
   try {
-    const frontendBase = process.env.FRONTEND_URL || "http://localhost:3000"
+    const frontendBase = process.env.FRONTEND_URL || "https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net"
     const resetUrl = `${frontendBase}/auth/reset-password/${token}`
 
     const subject = "Réinitialisez votre mot de passe";

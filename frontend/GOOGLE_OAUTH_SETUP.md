@@ -30,9 +30,9 @@ This guide explains how to set up Google OAuth login for the Bildrive applicatio
 
 ### 1.5 Set Authorized Redirect URIs
 For development:
-- `http://localhost:3000`
-- `http://localhost:3000/auth/login`
-- `http://localhost:3000/auth/register`
+- `https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net`
+- `https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net/auth/login`
+- `https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net/auth/register`
 
 For production:
 - `https://yourdomain.com`
@@ -125,7 +125,7 @@ The backend already supports:
 **Solution**: Enable Google+ API in Google Cloud Console
 
 #### Issue: "CORS errors" in development
-**Solution**: Ensure your backend allows requests from `http://localhost:3000`
+**Solution**: Ensure your backend allows requests from `https://frontend-bildrive-ckhhdbfjg7g0bzhw.francecentral-01.azurewebsites.net`
 
 ## Step 6: Production Deployment
 
