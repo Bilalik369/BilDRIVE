@@ -214,38 +214,90 @@ const RideRequestPage = () => {
       <div className="max-w-6xl mx-auto p-4 sm:p-6">
         {/* Modern Progress Indicator */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            {steps.map((step, index) => {
-              const StepIcon = step.icon
-              const isActive = currentStep === step.number
-              const isCompleted = currentStep > step.number
-              return (
-                <div key={step.number} className="flex items-center">
-                  <div
-                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      isCompleted 
-                        ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg" 
-                        : isActive 
-                        ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-110" 
-                        : "bg-gray-200 text-gray-500"
-                    }`}
-                  >
-                    <StepIcon className="w-6 h-6" />
-                  </div>
-                  {index < steps.length - 1 && (
-                    <div className={`w-20 h-1 mx-3 transition-all duration-300 ${
-                      isCompleted ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gray-200"
-                    }`} />
-                  )}
-                </div>
-              )
-            })}
+          {/* Mobile Progress Indicator */}
+          <div className="block md:hidden mb-6">
+            <div className="flex items-center justify-center mb-4">
+              <div className="flex items-center space-x-2">
+                {steps.map((step, index) => {
+                  const StepIcon = step.icon
+                  const isActive = currentStep === step.number
+                  const isCompleted = currentStep > step.number
+                  const isVisible = currentStep >= step.number
+                  
+                  if (!isVisible) return null
+                  
+                  return (
+                    <div key={step.number} className="flex items-center">
+                      <div
+                        className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isCompleted 
+                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg" 
+                            : isActive 
+                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-110" 
+                            : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        <StepIcon className="w-7 h-7" />
+                      </div>
+                      {index < steps.length - 1 && currentStep > step.number && (
+                        <div className={`w-8 h-1 mx-2 transition-all duration-300 ${
+                          isCompleted ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gray-200"
+                        }`} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">{steps[currentStep - 1].title}</h2>
+              <p className="text-gray-600 text-sm">
+                Étape {currentStep} sur {steps.length}
+              </p>
+            </div>
           </div>
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">{steps[currentStep - 1].title}</h2>
-            <p className="text-gray-600 text-lg">
-              Étape {currentStep} sur {steps.length}
-            </p>
+
+          {/* Desktop Progress Indicator */}
+          <div className="hidden md:block">
+            <div className="flex items-center justify-center mb-6">
+              <div className="flex items-center space-x-4">
+                {steps.map((step, index) => {
+                  const StepIcon = step.icon
+                  const isActive = currentStep === step.number
+                  const isCompleted = currentStep > step.number
+                  const isVisible = currentStep >= step.number
+                  
+                  if (!isVisible) return null
+                  
+                  return (
+                    <div key={step.number} className="flex items-center">
+                      <div
+                        className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isCompleted 
+                            ? "bg-gradient-to-r from-green-500 to-green-600 text-white shadow-lg" 
+                            : isActive 
+                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg scale-110" 
+                            : "bg-gray-200 text-gray-500"
+                        }`}
+                      >
+                        <StepIcon className="w-6 h-6" />
+                      </div>
+                      {index < steps.length - 1 && currentStep > step.number && (
+                        <div className={`w-20 h-1 mx-3 transition-all duration-300 ${
+                          isCompleted ? "bg-gradient-to-r from-green-500 to-green-600" : "bg-gray-200"
+                        }`} />
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">{steps[currentStep - 1].title}</h2>
+              <p className="text-gray-600 text-lg">
+                Étape {currentStep} sur {steps.length}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -473,6 +525,28 @@ const RideRequestPage = () => {
                 {...register("notes")}
               />
             </div>
+
+            {/* Navigation Buttons */}
+            <div className="mt-8 flex justify-between items-center">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prevStep}
+                icon={<ArrowLeft className="w-4 h-4" />}
+                className="bg-transparent border-gray-300 text-gray-600 hover:bg-gray-50 px-8 py-4 text-lg"
+              >
+                Précédent
+              </Button>
+
+              <Button 
+                type="button" 
+                onClick={() => setCurrentStep(4)}
+                icon={<CreditCard className="w-5 h-5" />}
+                className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 px-12 py-4 text-xl shadow-xl"
+              >
+                Voir le récapitulatif
+              </Button>
+            </div>
           </Card>
         )}
 
@@ -566,7 +640,7 @@ const RideRequestPage = () => {
             Précédent
           </Button>
 
-          {currentStep < 4 ? (
+          {currentStep < 3 ? (
             <Button 
               type="button" 
               onClick={nextStep} 
@@ -575,7 +649,7 @@ const RideRequestPage = () => {
             >
               Suivant
             </Button>
-          ) : (
+          ) : currentStep === 4 ? (
             <Button 
               type="submit" 
               loading={loading} 
@@ -585,7 +659,7 @@ const RideRequestPage = () => {
             >
               {watchedValues.scheduledTime ? "Programmer la course" : "Demander maintenant"}
             </Button>
-          )}
+          ) : null}
         </div>
       </form>
     </div>
