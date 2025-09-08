@@ -76,32 +76,14 @@ function App() {
   });
 
  
+  // If no Google Client ID, show warning but continue
   if (!googleClientId) {
-    console.error('Google Client ID is missing! Please set REACT_APP_GOOGLE_CLIENT_ID in your .env file');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-red-50">
-        <div className="max-w-md mx-auto text-center p-8">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Configuration Error</h1>
-          <p className="text-red-500 mb-4">
-            Google OAuth Client ID is missing. Please check your environment configuration.
-          </p>
-          <div className="bg-gray-100 p-4 rounded-lg text-left text-sm">
-            <p className="font-semibold mb-2">To fix this:</p>
-            <ol className="list-decimal list-inside space-y-1">
-              <li>Create a <code>.env</code> file in the frontend directory</li>
-              <li>Add: <code>REACT_APP_GOOGLE_CLIENT_ID=your_client_id_here</code></li>
-              <li>Restart your development server</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    );
+    console.warn('Google Client ID is missing! Google login will show a custom button.');
   }
 
-  return (
-    <GoogleOAuthProvider clientId={googleClientId}>
-      <Provider store={store}>
-        <Router>
+  const AppContent = () => (
+    <Provider store={store}>
+      <Router>
           <Navbar />
           <Routes>
             {/* Public routes */}
@@ -255,8 +237,18 @@ function App() {
           <Footer />
         </Router>
       </Provider>
-    </GoogleOAuthProvider>
-  );
+    );
+
+  // Wrap with GoogleOAuthProvider only if clientId is available
+  if (googleClientId) {
+    return (
+      <GoogleOAuthProvider clientId={googleClientId}>
+        <AppContent />
+      </GoogleOAuthProvider>
+    );
+  }
+
+  return <AppContent />;
 }
 const LandingPage = ({ section }) => {
   // Scroll to section when provided via route
