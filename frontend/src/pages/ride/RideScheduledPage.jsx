@@ -17,6 +17,44 @@ const RideScheduledPage = () => {
   const [filter, setFilter] = useState("upcoming")
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [selectedRide, setSelectedRide] = useState(null)
+  const [mockRides, setMockRides] = useState([
+    {
+      _id: "scheduled1",
+      pickup: { address: "123 Rue Mohammed V, Casablanca" },
+      destination: { address: "Aéroport Mohammed V, Nouaceur" },
+      scheduledTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // Dans 2h
+      vehicleType: "standard",
+      passengers: 2,
+      price: { total: 45 },
+      status: RIDE_STATUS.SCHEDULED,
+      createdAt: new Date().toISOString(),
+      notes: "Vol à 14h30, merci d'être ponctuel",
+    },
+    {
+      _id: "scheduled2",
+      pickup: { address: "Gare Casa-Port" },
+      destination: { address: "Twin Center, Casablanca" },
+      scheduledTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Demain
+      vehicleType: "premium",
+      passengers: 1,
+      price: { total: 25 },
+      status: RIDE_STATUS.SCHEDULED,
+      createdAt: new Date().toISOString(),
+      notes: "",
+    },
+    {
+      _id: "scheduled3",
+      pickup: { address: "Hôtel Hyatt Regency" },
+      destination: { address: "Marina de Casablanca" },
+      scheduledTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Dans 3 jours
+      vehicleType: "suv",
+      passengers: 4,
+      price: { total: 35 },
+      status: RIDE_STATUS.SCHEDULED,
+      createdAt: new Date().toISOString(),
+      notes: "Famille avec enfants",
+    },
+  ])
   
   // Get theme from Redux store
   const { theme } = useSelector((state) => state.ui)
@@ -28,47 +66,8 @@ const RideScheduledPage = () => {
   }, [])
 
   useEffect(() => {
-    // Simulation de courses programmées
-    const mockScheduledRides = [
-      {
-        _id: "scheduled1",
-        pickup: { address: "123 Rue Mohammed V, Casablanca" },
-        destination: { address: "Aéroport Mohammed V, Nouaceur" },
-        scheduledTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // Dans 2h
-        vehicleType: "standard",
-        passengers: 2,
-        price: { total: 45 },
-        status: RIDE_STATUS.SCHEDULED,
-        createdAt: new Date().toISOString(),
-        notes: "Vol à 14h30, merci d'être ponctuel",
-      },
-      {
-        _id: "scheduled2",
-        pickup: { address: "Gare Casa-Port" },
-        destination: { address: "Twin Center, Casablanca" },
-        scheduledTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Demain
-        vehicleType: "premium",
-        passengers: 1,
-        price: { total: 25 },
-        status: RIDE_STATUS.SCHEDULED,
-        createdAt: new Date().toISOString(),
-        notes: "",
-      },
-      {
-        _id: "scheduled3",
-        pickup: { address: "Hôtel Hyatt Regency" },
-        destination: { address: "Marina de Casablanca" },
-        scheduledTime: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // Dans 3 jours
-        vehicleType: "suv",
-        passengers: 4,
-        price: { total: 35 },
-        status: RIDE_STATUS.SCHEDULED,
-        createdAt: new Date().toISOString(),
-        notes: "Famille avec enfants",
-      },
-    ]
-
-    const filtered = mockScheduledRides.filter((ride) => {
+    // Filtrer les données mock selon le filtre sélectionné
+    const filtered = mockRides.filter((ride) => {
       const scheduledTime = new Date(ride.scheduledTime)
       const now = new Date()
 
@@ -87,18 +86,29 @@ const RideScheduledPage = () => {
     })
 
     setScheduledRides(filtered)
-  }, [rides, filter])
+  }, [filter, mockRides])
 
   const handleCancelRide = async () => {
     if (!selectedRide) return
 
     try {
-      await cancelRide(selectedRide._id, "Annulation par l'utilisateur")
-      setScheduledRides((prev) => prev.filter((ride) => ride._id !== selectedRide._id))
+      // Pour les données mock, on supprime directement de la liste locale
+      // Pour les vraies données, on appellerait l'API
+      if (selectedRide._id.startsWith('scheduled')) {
+        // Données mock - suppression locale
+        setMockRides((prev) => prev.filter((ride) => ride._id !== selectedRide._id))
+        toast.success("Course programmée annulée")
+      } else {
+        // Données réelles - appel API
+        await cancelRide(selectedRide._id, "Annulation par l'utilisateur")
+        setScheduledRides((prev) => prev.filter((ride) => ride._id !== selectedRide._id))
+        toast.success("Course programmée annulée")
+      }
+      
       setShowCancelModal(false)
       setSelectedRide(null)
-      toast.success("Course programmée annulée")
     } catch (error) {
+      console.error("Erreur lors de l'annulation:", error)
       toast.error("Erreur lors de l'annulation")
     }
   }
@@ -233,8 +243,9 @@ const RideScheduledPage = () => {
       ) : (
         <div className="space-y-4">
           {scheduledRides.map((ride) => (
-            <Card key={ride._id} className={`p-6 hover:shadow-lg transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
-              <div className="flex items-center justify-between">
+            <Card key={ride._id} className={`p-4 md:p-6 hover:shadow-lg transition-shadow ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+              {/* Desktop Layout */}
+              <div className="hidden md:flex items-center justify-between">
                 <div className="flex items-center gap-6 flex-1">
                   {/* Temps */}
                   <div className="text-center min-w-[120px]">
@@ -297,6 +308,96 @@ const RideScheduledPage = () => {
                         setSelectedRide(ride)
                         setShowCancelModal(true)
                       }}
+                    >
+                      Annuler
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mobile Layout */}
+              <div className="md:hidden">
+                {/* Header with time and countdown */}
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className={`text-xl font-bold ${isDark ? 'text-orange-400' : 'text-orange-500'}`}>
+                      {formatTime(new Date(ride.scheduledTime))}
+                    </div>
+                    <div className={`text-xs ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {formatDate(ride.scheduledTime)}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-lg font-bold ${isDark ? 'text-orange-400' : 'text-orange-500'}`}>
+                      {formatCurrency(ride.price.total)}
+                    </div>
+                    <div className="text-xs text-blue-500 font-medium">
+                      {getTimeUntilRide(ride.scheduledTime)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Route */}
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="flex flex-col items-center mt-1">
+                    <MapPin className="w-4 h-4 text-green-500 mb-1" />
+                    <div className={`w-px h-6 ${isDark ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+                    <MapPin className="w-4 h-4 text-red-500 mt-1" />
+                  </div>
+                  <div className="flex-1">
+                    <div className={`font-medium text-sm mb-1 ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                      {ride.pickup.address}
+                    </div>
+                    <div className={`text-sm mb-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                      {ride.destination.address}
+                    </div>
+                    {ride.notes && (
+                      <div className={`text-xs rounded px-2 py-1 ${isDark ? 'text-gray-300 bg-gray-700' : 'text-gray-500 bg-gray-50'}`}>
+                        {ride.notes}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Details and Actions */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="text-center">
+                      <div className={`font-medium capitalize text-sm ${isDark ? 'text-gray-200' : 'text-gray-900'}`}>
+                        {ride.vehicleType}
+                      </div>
+                      <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                        {ride.passengers} passager{ride.passengers > 1 ? "s" : ""}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    {canModify(ride.scheduledTime) && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        icon={<Edit className="w-4 h-4" />}
+                        onClick={() =>
+                          navigate(`/ride/request`, {
+                            state: { editRide: ride },
+                          })
+                        }
+                        className="px-3 py-1 text-xs"
+                      >
+                        Modifier
+                      </Button>
+                    )}
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      icon={<Trash2 className="w-4 h-4" />}
+                      onClick={() => {
+                        setSelectedRide(ride)
+                        setShowCancelModal(true)
+                      }}
+                      className="px-3 py-1 text-xs"
                     >
                       Annuler
                     </Button>
