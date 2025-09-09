@@ -15,7 +15,6 @@ import Footer from "./components/layout/Footer"
 
 
 import Hero from "../src/components/landing/Hero"
-import Features from "../src/components/landing/Features"
 import About from "../src/components/landing/About"
 import HowItWorks from "../src/components/landing/HowItWorks"
 import Testimonials from "../src/components/landing/Testimonials"
@@ -263,7 +262,6 @@ const LandingPage = ({ section }) => {
   return (
     <div className="min-h-screen">
       <Hero />
-      <Features />
       <About />
       <HowItWorks />
       <Testimonials />

@@ -189,25 +189,32 @@ const RideDetailsPage = () => {
                 Informations de la course
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <Car className="w-10 h-10 mx-auto mb-4 text-gray-600" />
-                  <div className="font-bold text-xl capitalize">{ride.vehicleType}</div>
-                  <div className="text-sm text-gray-600 mt-2">Type de véhicule</div>
+                {/* Vehicle Type - Blue */}
+                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <Car className="w-10 h-10 mx-auto mb-4 text-blue-600" />
+                  <div className="font-bold text-xl capitalize text-blue-900">{ride.vehicleType}</div>
+                  <div className="text-sm text-blue-700 mt-2">Type de véhicule</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <User className="w-10 h-10 mx-auto mb-4 text-gray-600" />
-                  <div className="font-bold text-xl">{ride.passengers}</div>
-                  <div className="text-sm text-gray-600 mt-2">Passagers</div>
+                
+                {/* Passengers - Green */}
+                <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+                  <User className="w-10 h-10 mx-auto mb-4 text-green-600" />
+                  <div className="font-bold text-xl text-green-900">{ride.passengers}</div>
+                  <div className="text-sm text-green-700 mt-2">Passagers</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <MapPin className="w-10 h-10 mx-auto mb-4 text-gray-600" />
-                  <div className="font-bold text-xl">{ride.displayDistance || formatDistance(ride.distance)}</div>
-                  <div className="text-sm text-gray-600 mt-2">Distance</div>
+                
+                {/* Distance - Orange */}
+                <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                  <MapPin className="w-10 h-10 mx-auto mb-4 text-orange-600" />
+                  <div className="font-bold text-xl text-orange-900">{ride.displayDistance || formatDistance(ride.distance)}</div>
+                  <div className="text-sm text-orange-700 mt-2">Distance</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <Clock className="w-10 h-10 mx-auto mb-4 text-gray-600" />
-                  <div className="font-bold text-xl">{ride.displayDuration || formatDuration(ride.duration)}</div>
-                  <div className="text-sm text-gray-600 mt-2">Durée</div>
+                
+                {/* Duration - Purple */}
+                <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                  <Clock className="w-10 h-10 mx-auto mb-4 text-purple-600" />
+                  <div className="font-bold text-xl text-purple-900">{ride.displayDuration || formatDuration(ride.duration)}</div>
+                  <div className="text-sm text-purple-700 mt-2">Durée</div>
                 </div>
               </div>
 

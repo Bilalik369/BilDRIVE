@@ -587,25 +587,32 @@ const RideRequestPage = () => {
 
               {/* Details grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <Car className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <div className="font-bold text-lg capitalize">{watchedValues.vehicleType}</div>
-                  <div className="text-sm text-gray-600">Véhicule</div>
+                {/* Vehicle Type - Blue */}
+                <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                  <Car className="w-8 h-8 mx-auto mb-3 text-blue-600" />
+                  <div className="font-bold text-lg capitalize text-blue-900">{watchedValues.vehicleType}</div>
+                  <div className="text-sm text-blue-700">Véhicule</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <Users className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <div className="font-bold text-lg">{watchedValues.passengers}</div>
-                  <div className="text-sm text-gray-600">Passagers</div>
+                
+                {/* Passengers - Green */}
+                <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+                  <Users className="w-8 h-8 mx-auto mb-3 text-green-600" />
+                  <div className="font-bold text-lg text-green-900">{watchedValues.passengers}</div>
+                  <div className="text-sm text-green-700">Passagers</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <Clock className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <div className="font-bold text-lg">{routeInfo?.durationText || 'N/A'}</div>
-                  <div className="text-sm text-gray-600">Durée</div>
+                
+                {/* Duration - Orange */}
+                <div className="text-center p-6 bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl border border-orange-200">
+                  <Clock className="w-8 h-8 mx-auto mb-3 text-orange-600" />
+                  <div className="font-bold text-lg text-orange-900">{routeInfo?.durationText || 'N/A'}</div>
+                  <div className="text-sm text-orange-700">Durée</div>
                 </div>
-                <div className="text-center p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200">
-                  <CreditCard className="w-8 h-8 mx-auto mb-3 text-gray-600" />
-                  <div className="font-bold text-lg capitalize">{watchedValues.paymentMethod}</div>
-                  <div className="text-sm text-gray-600">Paiement</div>
+                
+                {/* Payment - Purple */}
+                <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                  <CreditCard className="w-8 h-8 mx-auto mb-3 text-purple-600" />
+                  <div className="font-bold text-lg capitalize text-purple-900">{watchedValues.paymentMethod}</div>
+                  <div className="text-sm text-purple-700">Paiement</div>
                 </div>
               </div>
 
