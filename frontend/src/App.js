@@ -76,7 +76,6 @@ function App() {
   });
 
  
-  // If no Google Client ID, show warning but continue
   if (!googleClientId) {
     console.warn('Google Client ID is missing! Google login will show a custom button.');
   }

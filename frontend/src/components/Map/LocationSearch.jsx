@@ -321,11 +321,18 @@ const LocationSearch = ({
           placeholder={placeholder}
           disabled={disabled}
           className={`
-            w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg
-            focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent
+            w-full pl-10 pr-10 py-3 bg-white border border-gray-300 rounded-full
+            text-gray-900 placeholder-gray-500
+            focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent
             disabled:bg-gray-100 disabled:cursor-not-allowed
+            transition-all duration-200
             ${disabled ? 'text-gray-500' : 'text-gray-900'}
           `}
+          style={{
+            borderRadius: '20px',
+            outline: '0 !important',
+            boxSizing: 'border-box',
+          }}
         />
 
         {inputValue && (
