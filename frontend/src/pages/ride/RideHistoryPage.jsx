@@ -161,23 +161,23 @@ const RideHistoryPage = () => {
 
       {/* Statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-        <Card className="p-6 text-center bg-white border border-gray-200">
-          <div className="text-3xl font-bold text-primary mb-2">{stats.total}</div>
+        <Card className="p-6 text-center bg-white border border-gray-200 md:bg-orange-50 md:border-orange-200">
+          <div className="text-3xl font-bold text-orange-600 mb-2">{stats.total}</div>
           <div className="text-gray-600">Total</div>
         </Card>
-        <Card className="p-6 text-center bg-white border border-gray-200">
+        <Card className="p-6 text-center bg-white border border-gray-200 md:bg-green-50 md:border-green-200">
           <div className="text-3xl font-bold text-green-600 mb-2">{stats.completed}</div>
           <div className="text-gray-600">Terminées</div>
         </Card>
-        <Card className="p-6 text-center bg-white border border-gray-200">
+        <Card className="p-6 text-center bg-white border border-gray-200 md:bg-red-50 md:border-red-200">
           <div className="text-3xl font-bold text-red-600 mb-2">{stats.cancelled}</div>
           <div className="text-gray-600">Annulées</div>
         </Card>
-        <Card className="p-6 text-center bg-white border border-gray-200">
+        <Card className="p-6 text-center bg-white border border-gray-200 md:bg-purple-50 md:border-purple-200">
           <div className="text-3xl font-bold text-purple-600 mb-2">{formatCurrency(stats.totalSpent)}</div>
           <div className="text-gray-600">Dépensé</div>
         </Card>
-        <Card className="p-6 text-center bg-white border border-gray-200">
+        <Card className="p-6 text-center bg-white border border-gray-200 md:bg-yellow-50 md:border-yellow-200">
           <div className="text-3xl font-bold text-yellow-600 mb-2">{stats.averageRating.toFixed(1)}</div>
           <div className="text-gray-600">Note moyenne</div>
         </Card>
