@@ -17,7 +17,6 @@ import Footer from "./components/layout/Footer"
 import Hero from "../src/components/landing/Hero"
 import About from "../src/components/landing/About"
 import HowItWorks from "../src/components/landing/HowItWorks"
-import Testimonials from "../src/components/landing/Testimonials"
 import Pricing from "../src/components/landing/Pricing"
 import Contact from "../src/components/landing/Contact"
 
@@ -264,7 +263,6 @@ const LandingPage = ({ section }) => {
       <Hero />
       <About />
       <HowItWorks />
-      <Testimonials />
       <Pricing />
       <section id="contact"><Contact /></section>
     </div>
