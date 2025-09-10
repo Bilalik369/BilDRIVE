@@ -67,7 +67,7 @@ const Pricing = () => {
   ]
 
 
-  const formatPrice = (price) => `$${price.toFixed(2)}`
+  const formatPrice = (price) => `${price.toFixed(2)} DH`
 
   return (
     <section id="pricing" className="relative bg-gradient-to-br from-bg-main via-white to-card-bg py-20">
