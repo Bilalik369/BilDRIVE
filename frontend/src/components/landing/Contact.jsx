@@ -30,8 +30,14 @@ const Contact = () => {
   }
 
   return (
-    <section className="py-20 bg-bg-main">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="relative bg-gradient-to-br from-bg-main via-white to-card-bg py-20">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary opacity-10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-text-secondary opacity-10 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-dark mb-4">Contactez-nous</h2>
           <p className="text-text-secondary max-w-2xl mx-auto">
@@ -46,7 +52,7 @@ const Contact = () => {
               animationData={contactAnimation}
               loop={true}
               autoplay={true}
-              style={{ height: '400px', width: '100%' }}
+              style={{ height: '500px', width: '100%' }}
             />
           </div>
 
@@ -130,11 +136,11 @@ const Contact = () => {
                   </div>
                   <div>
                     <Phone className="w-4 h-4 text-primary mx-auto mb-1" />
-                    <p className="text-xs text-text-secondary">+212 5XX-XXX-XXX</p>
+                    <p className="text-xs text-text-secondary">+212 6052-28749</p>
                   </div>
                   <div>
                     <MapPin className="w-4 h-4 text-primary mx-auto mb-1" />
-                    <p className="text-xs text-text-secondary">Casablanca, Maroc</p>
+                    <p className="text-xs text-text-secondary">Beni mellal, Maroc</p>
                   </div>
                 </div>
               </div>

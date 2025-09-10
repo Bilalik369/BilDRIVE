@@ -1,4 +1,4 @@
-import { Check, Car, Crown, Zap } from "lucide-react"
+import { Check, Car, Crown } from "lucide-react"
 import Button from "../ui/Button"
 import Card from "../ui/Card"
 
@@ -66,38 +66,17 @@ const Pricing = () => {
     },
   ]
 
-  const additionalServices = [
-    {
-      name: "Airport Transfer",
-      description: "Reliable airport pickup and drop-off",
-      price: "From $25",
-      icon: "✈️",
-    },
-    {
-      name: "Scheduled Rides",
-      description: "Book rides up to 30 days in advance",
-      price: "No extra fee",
-      icon: "📅",
-    },
-    {
-      name: "Corporate Accounts",
-      description: "Business travel solutions",
-      price: "Custom pricing",
-      icon: "🏢",
-    },
-    {
-      name: "Package Delivery",
-      description: "Send packages across the city",
-      price: "From $8",
-      icon: "📦",
-    },
-  ]
 
   const formatPrice = (price) => `$${price.toFixed(2)}`
 
   return (
-    <section id="pricing" className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="pricing" className="relative bg-gradient-to-br from-bg-main via-white to-card-bg py-20">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary opacity-10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-text-secondary opacity-10 rounded-full blur-3xl"></div>
+      </div>
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text-dark mb-6">
@@ -164,50 +143,6 @@ const Pricing = () => {
           ))}
         </div>
 
-        {/* Price Calculator */}
-        <Card className="p-8 mb-16 bg-bg-main">
-          <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-text-dark mb-4">Estimate Your Fare</h3>
-            <p className="text-text-secondary">Get an instant price estimate for your trip</p>
-          </div>
-
-          <div className="max-w-2xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <input
-                type="text"
-                placeholder="Pickup location"
-                className="w-full px-4 py-3 bg-white border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-              <input
-                type="text"
-                placeholder="Destination"
-                className="w-full px-4 py-3 bg-white border border-border-color rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <div className="text-center">
-              <Button icon={<Zap className="w-4 h-4" />}>Calculate Fare</Button>
-            </div>
-          </div>
-        </Card>
-
-        {/* Additional Services */}
-        <div className="mb-16">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl lg:text-3xl font-bold text-text-dark mb-4">Additional Services</h3>
-            <p className="text-text-secondary">More ways we can help you get around</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {additionalServices.map((service, index) => (
-              <Card key={index} className="p-6 text-center">
-                <div className="text-4xl mb-4">{service.icon}</div>
-                <h4 className="text-lg font-semibold text-text-dark mb-2">{service.name}</h4>
-                <p className="text-text-secondary text-sm mb-4">{service.description}</p>
-                <div className="text-primary font-semibold">{service.price}</div>
-              </Card>
-            ))}
-          </div>
-        </div>
 
         {/* Guarantee */}
         <Card className="p-8 text-center bg-gradient-to-r from-primary to-text-secondary text-white">

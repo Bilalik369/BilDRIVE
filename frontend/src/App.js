@@ -12,6 +12,7 @@ import ResetPassword from "./pages/auth/ResetPassword";
 
 import Navbar from "./components/layout/Navbar"
 import Footer from "./components/layout/Footer"
+import BackToTop from "./components/ui/BackToTop"
 
 
 import Hero from "../src/components/landing/Hero"
@@ -232,6 +233,7 @@ function App() {
             } />
           </Routes>
           <Footer />
+          <BackToTop />
         </Router>
       </Provider>
     );
