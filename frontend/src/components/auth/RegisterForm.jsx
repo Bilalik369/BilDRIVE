@@ -60,7 +60,7 @@ const RegisterForm = () => {
       
       window.showToast?.success("Registration successful! Please check your email for verification before logging in.")
       
-      // Redirect to login page after successful registration
+      
       navigate("/auth/login")
     } catch (error) {
       console.error("Frontend - registration error:", error)

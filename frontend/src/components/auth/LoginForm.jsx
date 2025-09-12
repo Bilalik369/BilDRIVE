@@ -51,7 +51,7 @@ const LoginForm = () => {
         navigate("/dashboard")
       }
     } catch (error) {
-      // Error is already handled by the slice
+      
     }
   }
 
@@ -67,7 +67,7 @@ const LoginForm = () => {
       setShowResendForm(false)
       setResendEmail("")
     } catch (error) {
-      // Error is already handled by the slice
+      
     }
   }
 
@@ -83,7 +83,7 @@ const LoginForm = () => {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <Input
               label="Email Address"
-              type="email"
+              type="text"
               placeholder="Enter your email"
               icon={<Mail className="w-5 h-5" />}
               error={errors.email?.message}
