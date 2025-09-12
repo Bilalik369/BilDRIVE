@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { toast } from "react-hot-toast"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
@@ -27,7 +26,7 @@ const LoginForm = () => {
 
   React.useEffect(() => {
     if (error) {
-      toast.error(error)
+      window.showToast?.error(error)
       dispatch(clearError())
     }
   }, [error, dispatch])
@@ -36,14 +35,14 @@ const LoginForm = () => {
   useEffect(() => {
     const verified = searchParams.get("verified")
     if (verified === "true") {
-      toast.success("Email verified successfully! You can now log in.")
+      window.showToast?.success("Email verified successfully! You can now log in.")
     }
   }, [searchParams])
 
   const onSubmit = async (data) => {
     try {
       const result = await dispatch(loginUser(data)).unwrap()
-      toast.success("Login successful!")
+      window.showToast?.success("Login successful! Welcome back!")
 
      
       if (result.user.role === "driver") {
@@ -52,19 +51,19 @@ const LoginForm = () => {
         navigate("/dashboard")
       }
     } catch (error) {
-      
+      // Error is already handled by the slice
     }
   }
 
   const handleResendVerification = async () => {
     if (!resendEmail) {
-      toast.error("Please enter your email address")
+      window.showToast?.error("Please enter your email address")
       return
     }
     
     try {
       await dispatch(resendVerificationEmail(resendEmail)).unwrap()
-      toast.success("Verification email sent successfully! Please check your inbox.")
+      window.showToast?.success("Verification email sent successfully! Please check your inbox.")
       setShowResendForm(false)
       setResendEmail("")
     } catch (error) {

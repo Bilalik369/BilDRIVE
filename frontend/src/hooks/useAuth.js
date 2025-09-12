@@ -18,6 +18,7 @@ export const useAuth = () => {
 
   const handleLogout = () => {
     dispatch(logout())
+    window.showToast?.success("Logged out successfully! See you soon!")
     navigate("/")
   }
 

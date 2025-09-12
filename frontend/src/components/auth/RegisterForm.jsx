@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate, useSearchParams } from "react-router-dom"
 import { User, Mail, Lock, Phone, Car, FileText } from "lucide-react"
-import { toast } from "react-hot-toast"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
@@ -40,7 +39,7 @@ const RegisterForm = () => {
 
   React.useEffect(() => {
     if (error) {
-      toast.error(error)
+      window.showToast?.error(error)
       dispatch(clearError())
     }
   }, [error, dispatch])
@@ -59,7 +58,7 @@ const RegisterForm = () => {
       const result = await dispatch(registerUser(submitData)).unwrap()
       console.log("Frontend - registration result:", result)
       
-      toast.success("Registration successful! Please check your email for verification before logging in.")
+      window.showToast?.success("Registration successful! Please check your email for verification before logging in.")
       
       // Redirect to login page after successful registration
       navigate("/auth/login")
