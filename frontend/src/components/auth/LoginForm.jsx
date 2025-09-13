@@ -31,7 +31,7 @@ const LoginForm = () => {
     }
   }, [error, dispatch])
 
-  // Check for verification success message
+  
   useEffect(() => {
     const verified = searchParams.get("verified")
     if (verified === "true") {

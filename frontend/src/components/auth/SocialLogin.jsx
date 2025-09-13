@@ -34,7 +34,7 @@ const SocialLogin = () => {
     window.showToast?.error("Google authentication failed. Please try again.")
   }
 
-  // Check if Google Client ID is available
+
   const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID
 
   if (!googleClientId) {

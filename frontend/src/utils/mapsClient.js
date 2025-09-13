@@ -82,19 +82,6 @@ export const reverseGeocode = async (coordinates) => {
   }
 };
 
-export const findNearbyPlaces = async (coordinates, radius = 1000, type = null) => {
-  try {
-    const response = await mapsAPI.post('/nearby-places', {
-      coordinates,
-      radius,
-      type
-    });
-    return response;
-  } catch (error) {
-    console.error('Error finding nearby places:', error);
-    throw error;
-  }
-};
 
 export const calculateETA = async (origin, destination) => {
   try {
@@ -109,17 +96,6 @@ export const calculateETA = async (origin, destination) => {
   }
 };
 
-export const getPlaceDetails = async (placeId) => {
-  try {
-    const response = await mapsAPI.post('/place-details', {
-      placeId
-    });
-    return response;
-  } catch (error) {
-    console.error('Error getting place details:', error);
-    throw error;
-  }
-};
 
 // Calculate price based on distance and time
 export const calculatePrice = (distance, duration, vehicleType = 'standard') => {
@@ -152,15 +128,6 @@ export const calculatePrice = (distance, duration, vehicleType = 'standard') => 
   };
 };
 
-// Utility functions
-export const validateCoordinates = (coordinates) => {
-  if (!Array.isArray(coordinates) || coordinates.length !== 2) {
-    return false;
-  }
-
-  const [lng, lat] = coordinates;
-  return lng >= -180 && lng <= 180 && lat >= -90 && lat <= 90;
-};
 
 export const formatDistance = (meters) => {
   if (meters < 1000) {
@@ -179,49 +146,15 @@ export const formatDuration = (seconds) => {
   return `${hours}h ${remainingMinutes}min`;
 };
 
-export const formatAddress = (address) => {
-  // Clean up address formatting
-  if (!address) return '';
-  
-  // Remove extra commas and spaces
-  return address.replace(/,\s*,/g, ',').replace(/^\s*,\s*/, '').replace(/\s*,\s*$/, '').trim();
-};
 
-// Mock data for development/testing
-export const MOCK_DATA = {
-  distance: {
-    distance: 5200,
-    distanceText: "5.2 km",
-    duration: 720,
-    durationText: "12 minutes"
-  },
-  directions: {
-    distance: 5200,
-    distanceText: "5.2 km", 
-    duration: 720,
-    durationText: "12 minutes",
-    polyline: "u~fsHfvqiM@r@Bd@Bb@?`@Ad@E`@I`@O^S\\[VeA|@"
-  },
-  geocode: {
-    coordinates: [-7.5898, 33.5731],
-    formattedAddress: "Avenue Mohammed V, Casablanca, Morocco",
-    placeId: "ChIJ...",
-    types: ["route"]
-  }
-};
 
 export default {
   getDistance,
   getDirections,
   geocodeAddress,
   reverseGeocode,
-  findNearbyPlaces,
   calculateETA,
-  getPlaceDetails,
   calculatePrice,
-  validateCoordinates,
   formatDistance,
-  formatDuration,
-  formatAddress,
-  MOCK_DATA
+  formatDuration
 };
