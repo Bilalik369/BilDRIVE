@@ -326,14 +326,14 @@ export const resendVerificationEmail = async(req , res , next)=>{
     const {email} = req.body;
 
     if (!email) {
-      return next(createError(400, "Email is required"))
+      return next(createError(400, "EMAIL_REQUIRED"))
     }
     const user = await User.findOne({email})
     if(!user){
-      return next(createError(404 , "User not find"))
+      return next(createError(404 , "EMAIL_NOT_FOUND"))
     }
     if(user.isVerified){
-      return next(createError(404 , "User already verfied"))
+      return next(createError(400 , "EMAIL_ALREADY_VERIFIED"))
     }
 
 
@@ -360,14 +360,12 @@ export const forgotPassword = async(req , res , next)=>{
   try{
     const {email} = req.body;
     if(!email){
-      return next(createError(400 , "Email is required "))
-
+      return next(createError(400 , "EMAIL_REQUIRED"))
     }
 
     const user = await User.findOne({email})
     if(!user){
-      return next(createError(404 , "User not fond"))
-
+      return next(createError(404 , "EMAIL_NOT_FOUND"))
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex")

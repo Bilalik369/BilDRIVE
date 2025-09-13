@@ -2,17 +2,19 @@
 
 import { useState } from "react"
 import { useForm } from "react-hook-form"
+import { useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import { Mail, ArrowLeft, Send } from "lucide-react"
 import { toast } from "react-hot-toast"
 import Button from "../ui/Button"
 import Input from "../ui/Input"
 import Card from "../ui/Card"
-import { authApi } from "../../redux/api/authApi"
+import { forgotPassword } from "../../redux/slices/authSlice"
 
 const ForgotPasswordForm = () => {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const dispatch = useDispatch()
 
   const {
     register,
@@ -24,11 +26,18 @@ const ForgotPasswordForm = () => {
   const onSubmit = async (data) => {
     setLoading(true)
     try {
-      await authApi.forgotPassword(data.email)
+      await dispatch(forgotPassword(data.email)).unwrap()
       setIsSubmitted(true)
       toast.success("Password reset instructions sent to your email!")
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to send reset instructions")
+      // Handle specific error messages
+      if (error === "EMAIL_NOT_FOUND") {
+        toast.error("Email address not found in our system")
+      } else if (error === "EMAIL_REQUIRED") {
+        toast.error("Please enter your email address")
+      } else {
+        toast.error(error || "Failed to send reset instructions")
+      }
     } finally {
       setLoading(false)
     }
@@ -40,10 +49,17 @@ const ForgotPasswordForm = () => {
 
     setLoading(true)
     try {
-      await authApi.forgotPassword(email)
+      await dispatch(forgotPassword(email)).unwrap()
       toast.success("Email sent again!")
     } catch (error) {
-      toast.error("Failed to resend email")
+      // Handle specific error messages
+      if (error === "EMAIL_NOT_FOUND") {
+        toast.error("Email address not found in our system")
+      } else if (error === "EMAIL_REQUIRED") {
+        toast.error("Please enter your email address")
+      } else {
+        toast.error("Failed to resend email")
+      }
     } finally {
       setLoading(false)
     }

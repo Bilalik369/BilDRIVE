@@ -49,6 +49,15 @@ export const resendVerificationEmail = createAsyncThunk("auth/resendVerification
   }
 })
 
+export const forgotPassword = createAsyncThunk("auth/forgotPassword", async (email, { rejectWithValue }) => {
+  try {
+    const response = await authApi.forgotPassword(email)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response?.data?.message || "Failed to send reset instructions")
+  }
+})
+
 export const socialLogin = createAsyncThunk("auth/socialLogin", async ({ provider, token }, { rejectWithValue }) => {
   try {
     const response = await authApi.socialLogin(provider, token)
@@ -133,6 +142,9 @@ const authSlice = createSlice({
         state.isEmailVerified = true
       })
       .addCase(resendVerificationEmail.fulfilled, (state, action) => {
+       
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
        
       })
    

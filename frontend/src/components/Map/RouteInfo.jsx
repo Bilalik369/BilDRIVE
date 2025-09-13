@@ -48,10 +48,10 @@ const RouteInfo = ({
 
   return (
     <div className={`bg-white rounded-lg shadow-md ${className}`}>
-      {/* Main route info */}
+      
       <div className="p-6">
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {/* Distance */}
+         
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <MapPin className="w-5 h-5 text-primary" />

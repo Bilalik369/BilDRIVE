@@ -67,7 +67,16 @@ const LoginForm = () => {
       setShowResendForm(false)
       setResendEmail("")
     } catch (error) {
-      
+      // Handle specific error messages
+      if (error === "EMAIL_NOT_FOUND") {
+        window.showToast?.error("Email address not found in our system")
+      } else if (error === "EMAIL_ALREADY_VERIFIED") {
+        window.showToast?.error("Email address is already verified")
+      } else if (error === "EMAIL_REQUIRED") {
+        window.showToast?.error("Please enter your email address")
+      } else {
+        window.showToast?.error(error || "Failed to send verification email")
+      }
     }
   }
 
