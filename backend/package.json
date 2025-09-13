@@ -20,8 +20,6 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
     "nodemailer": "^7.0.3",
-    "socket": "^1.0.8",
-    "socket.io": "^4.8.1",
     "stripe": "^18.3.0",
     "zod": "^3.25.67"
   },

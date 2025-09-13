@@ -7,7 +7,6 @@ import { calculateRidePrice } from "../utils/pricing.utils.js";
 import { getDistance, getDirections } from "../utils/maps.utils.js";
 import { findNearbyDrivers } from "../utils/driver.utils.js";
 import { createNotification } from "../utils/notification.utils.js";
-import { sendToUser, sendToDrivers } from "../utils/realtime.utils.js";
 
 export const requestRide = async (req, res, next) => {
   try {
@@ -153,17 +152,6 @@ export const requestRide = async (req, res, next) => {
           console.log(` Échec de création de notification pour ${driverUserId}`);
         }
 
-      
-        sendToUser(driverUserId.toString(), "new_ride_request", {
-          rideId: ride._id,
-          pickup: ride.pickup,
-          destination: ride.destination,
-          price: ride.price.total,
-          distance: parseFloat((ride.distance / 1000).toFixed(1)), 
-          duration: Math.ceil(ride.duration / 60), 
-          distanceText: `${(ride.distance / 1000).toFixed(1)} km`,
-          durationText: `${Math.ceil(ride.duration / 60)} min`,
-        });
 
       } catch (driverError) {
         console.error(` Erreur avec le chauffeur ${driver._id}:`, driverError);
@@ -171,13 +159,6 @@ export const requestRide = async (req, res, next) => {
       }
     }
 
-    sendToUser(req.user.id, "ride_searching", {
-      rideId: ride._id,
-      driversFound: nearbyDrivers.length,
-      estimatedPrice: ride.price.total,
-      distance: `${(ride.distance / 1000).toFixed(1)} km`,
-      duration: `${Math.ceil(ride.duration / 60)} min`,
-    });
 
  
     res.status(201).json({
@@ -271,19 +252,6 @@ export const acceptRide = async (req, res, next) => {
     });
 
 
-    sendToUser(ride.passenger._id.toString(), "ride_accepted", {
-      rideId: ride._id,
-      driver: {
-        id: driver._id,
-        name: driver.user.firstName + " " + driver.user.lastName,
-        phone: driver.user.phone,
-        rating: driver.user.rating,
-        profilePicture: driver.user.profilePicture,
-        vehicle: driver.vehicle,
-      },
-    });
-
-    sendToDrivers("drivers", "ride_taken", { rideId: ride._id });
 
     res.status(200).json({
       success: true,
@@ -328,10 +296,6 @@ export const arrivedAtPickup = async (req, res, next) => {
 
 
 
-    sendToUser(ride.passenger._id.toString(), "driver_arrived", {
-      rideId: ride._id,
-      message: "Votre chauffeur est arrivé",
-    });
 
     res.status(200).json({
       success: true,
@@ -376,10 +340,6 @@ export const startRide = async (req, res, next) => {
 
 
 
-    sendToUser(ride.passenger._id.toString(), "ride_started", {
-      rideId: ride._id,
-      message: "Votre course a commencé",
-    });
 
     res.status(200).json({
       success: true,
@@ -484,11 +444,6 @@ export const completeRide = async (req, res, next) => {
     
 
 
-    sendToUser(ride.passenger._id.toString(), "ride_completed", {
-      rideId: ride._id,
-      message: "Course terminée avec succès",
-      paymentStatus: ride.payment.status,
-    })
 
     res.status(200).json({
       success: true,
@@ -552,10 +507,6 @@ export const cancelRide = async (req, res, next) => {
 
 
     
-      sendToUser(ride.passenger._id.toString(), "ride_cancelled", {
-        rideId: ride._id,
-        reason: reason || "Annulée par le chauffeur",
-      })
     }
 
     if (isPassenger && ride.driver) {
@@ -581,10 +532,6 @@ export const cancelRide = async (req, res, next) => {
 
 
       
-      sendToUser(rideDriver.user.toString(), "ride_cancelled", {
-        rideId: ride._id,
-        reason: reason || "Annulée par le passager",
-      })
     }
 
     res.status(200).json({
