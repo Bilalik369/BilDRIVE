@@ -15,7 +15,7 @@ export const loginUser = createAsyncThunk("auth/login", async ({ email, password
 export const registerUser = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
   try {
     const response = await authApi.register(userData)
-    // Don't store token on registration - user needs to verify email first
+  
     return response.data
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Registration failed")

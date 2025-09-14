@@ -54,7 +54,7 @@ const RideDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="max-w-7xl mx-auto p-4 sm:p-6">
-        {/* Modern Header */}
+       
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
             <div className="flex-1">
@@ -93,7 +93,6 @@ const RideDashboard = () => {
           </div>
         </div>
 
-        {/* Active Ride Card */}
         {currentRide && (
           <Card className="mb-8 overflow-hidden border-0 shadow-xl bg-gradient-to-r from-blue-50 to-indigo-50">
             <div className="p-6">
@@ -157,7 +156,7 @@ const RideDashboard = () => {
           </Card>
         )}
 
-        {/* Statistics Cards */}
+      
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Card className="p-6 hover:shadow-lg transition-all duration-300 border-0 bg-white">
             <div className="flex items-center justify-between">
@@ -208,7 +207,7 @@ const RideDashboard = () => {
           </Card>
         </div>
 
-        {/* Search and Filter Section */}
+       
         <Card className="p-6 mb-8 border-0 shadow-lg">
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex items-center gap-3 flex-1">
@@ -239,7 +238,7 @@ const RideDashboard = () => {
           </div>
         </Card>
 
-        {/* Recent Rides Section */}
+    
         <Card className="border-0 shadow-lg">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
@@ -284,7 +283,7 @@ const RideDashboard = () => {
                     className="group relative bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-orange-200 cursor-pointer transition-all duration-300 overflow-hidden"
                     onClick={() => navigate(`/ride/details/${ride._id}`)}
                   >
-                    {/* Price Badge - Outside the card */}
+                   
                     <div className="absolute top-3 right-3 z-10">
                       <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                         {ride.price.total.toFixed(2)} DH
@@ -331,7 +330,7 @@ const RideDashboard = () => {
           </div>
         </Card>
 
-        {/* Quick Actions */}
+        
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <Card 
             className="p-6 cursor-pointer hover:shadow-xl transition-all duration-300 border-0 bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200"
